@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title></title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header><h1></h1></header>
+    <main>
+<script type="module">
+const IMDB = {
+	root: "https://www.imdb.com/search/title/?title_type=feature&count=250",
+	date: "&release_date=",
+	genres: "&genres=",
+	awards: "&groups=",
+	plot: "&plot=",
+}
+const GENRES = ["action","adventure","animation","biography","comedy",
+	"crime","documentary","drama","family","fantasy","film-noir",
+	"game-show","history","horror","music","musical","mystery",
+	"news","reality-tv","romance","sci-fi","sport","talk-show",
+	"thriller","war","western"];
+const AWARDS = ["oscar_winner","emmy_winner",
+	"golden_globe_winner","best_picture_winner","best_director_winner"];
+let render = (content) => {
+	let P = document.createElement("p");
+	//P.setAttribute("style","display: none;");
+	document.body.append(P);
+	P.innerHTML = content;
+	content = P.innerText;
+	P.remove();
+	return content;
+}
+let getIMDB = async (url) => {
+	url = await fetch(url);
+	url = await url.text();
+	url = (new DOMParser()).parseFromString(url, "text/html");
+	url = [...url.querySelectorAll(".lister-item")];
+	url = url.map(e => {
+		let movie = {};
+		movie.cover = e.querySelector(".lister-item-image a img").src;
+		movie.title = e.querySelector("h3 a").innerText;
+		movie.year = e.querySelector("h3")
+			.lastElementChild.innerText
+			.split("(")[1].split(")")[0];
+		[...e.querySelectorAll("p")].map((p,i) => {
+			if (i == 0) {
+				p = p.innerText.split(" | ");
+				movie.duration = render(p[1]);
+				movie.genres = render(p[2]).split(", ");
+			} else if (i == 1) {
+				movie.abstract = render(p.innerText);
+			} else if (i == 2) {
+				movie.director = render(p.querySelector("a").innerText);
+			}
+		})
+		return movie;
+	});
+	console.log(url);
+}
+getIMDB(IMDB.root+IMDB.genres+GENRES[7]+IMDB.awards+AWARDS[0]);
+</script>
+    </main>
+    <footer>
+    </footer>
+  </body>
+</html>
