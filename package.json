@@ -2,9 +2,9 @@
   "name": "imdb-api",
   "version": "0.0.1",
   "dependencies": {
-    "node-fetch":"^2.6.0",
-    "youtube-node":"^1.3.3",
-    "cheerio":"^1.0.0"
+    "cheerio": "^1.0.0-rc.3",
+    "node-fetch": "^2.6.0",
+    "youtube-node": "^1.3.3"
   },
   "engines": {
     "node": ">= 12.0.0",
