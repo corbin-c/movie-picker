@@ -1,0 +1,13 @@
+{
+  "name": "imdb-api",
+  "version": "0.0.1",
+  "dependencies": {
+    "node-fetch",
+    "youtube-node",
+    "cheerio"
+  },
+  "engines": {
+    "node": ">= 12.0.0",
+    "npm": ">= 6.0.0"
+  }
+}
