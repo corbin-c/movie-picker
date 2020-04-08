@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title></title>
+    <title>La Bande à Nonce</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css" />
@@ -9,61 +9,329 @@
   <body>
     <header><h1></h1></header>
     <main>
-<script type="module">
-const IMDB = {
-	root: "https://www.imdb.com/search/title/?title_type=feature&count=250",
-	date: "&release_date=",
-	genres: "&genres=",
-	awards: "&groups=",
-	plot: "&plot=",
-}
-const GENRES = ["action","adventure","animation","biography","comedy",
-	"crime","documentary","drama","family","fantasy","film-noir",
-	"game-show","history","horror","music","musical","mystery",
-	"news","reality-tv","romance","sci-fi","sport","talk-show",
-	"thriller","war","western"];
-const AWARDS = ["oscar_winner","emmy_winner",
-	"golden_globe_winner","best_picture_winner","best_director_winner"];
-let render = (content) => {
-	let P = document.createElement("p");
-	//P.setAttribute("style","display: none;");
-	document.body.append(P);
-	P.innerHTML = content;
-	content = P.innerText;
-	P.remove();
-	return content;
-}
-let getIMDB = async (url) => {
-	url = await fetch(url);
-	url = await url.text();
-	url = (new DOMParser()).parseFromString(url, "text/html");
-	url = [...url.querySelectorAll(".lister-item")];
-	url = url.map(e => {
-		let movie = {};
-		movie.cover = e.querySelector(".lister-item-image a img").src;
-		movie.title = e.querySelector("h3 a").innerText;
-		movie.year = e.querySelector("h3")
-			.lastElementChild.innerText
-			.split("(")[1].split(")")[0];
-		[...e.querySelectorAll("p")].map((p,i) => {
-			if (i == 0) {
-				p = p.innerText.split(" | ");
-				movie.duration = render(p[1]);
-				movie.genres = render(p[2]).split(", ");
-			} else if (i == 1) {
-				movie.abstract = render(p.innerText);
-			} else if (i == 2) {
-				movie.director = render(p.querySelector("a").innerText);
-			}
-		})
-		return movie;
-	});
-	console.log(url);
-}
-getIMDB(IMDB.root+IMDB.genres+GENRES[7]+IMDB.awards+AWARDS[0]);
-</script>
     </main>
     <footer>
     </footer>
+<script type="module">
+const genres = [{"picture":"🚓","label":"Action","value":"action"},
+  {"picture":"🗺️","label":"Aventure","value":"adventure"},
+  {"picture":"🐭","label":"Animation","value":"animation"},
+  {"picture":"📗","label":"Biographie","value":"biography"},
+  {"picture":"🤣","label":"Comédie","value":"comedy"},
+  {"picture":"🔪️","label":"Crime","value":"crime"},
+  {"picture":"🎭","label":"Drame","value":"drama"},
+  {"picture":"👪","label":"Famille","value":"family"},
+  {"picture":"🦄","label":"Fantastique","value":"fantasy"},
+  {"picture":"🕵️","label":"Film Noir","value":"film-noir"},
+  {"picture":"📜","label":"Historique","value":"history"},
+  {"picture":"🎃","label":"Horreur","value":"horror"},
+  {"picture":"🎼","label":"Musique","value":"music"},
+  {"picture":"🎤","label":"Comédie musicale","value":"musical"},
+  {"picture":"❓","label":"Mystère","value":"mystery"},
+  {"picture":"💞","label":"Romantique","value":"romance"},
+  {"picture":"🛸","label":"Science-Fiction","value":"sci-fi"},
+  {"picture":"🏀","label":"Sport","value":"sport"},
+  {"picture":"😰","label":"Thriller","value":"thriller"},
+  {"picture":"⚔️","label":"Guerre","value":"war"},
+  {"picture":"🏜️","label":"Western","value":"western"}];
+
+let infobox = ((parent) => {
+  const elements = {
+    date:"time",
+    title:"h1",
+    real:"h2",
+    duration:"h4",
+    genres:"h3",
+    resume:"p"
+  }
+  let output = {
+    element: document.createElement("article")
+  }
+  output.show = function(target) {
+    target = target.getBoundingClientRect();
+    target = {
+      x: target.left+target.width/2,
+      y: target.top+target.height/2
+    }
+    let str = "";
+    if (target.x > window.outerWidth-340) {
+      str += "right: "+(window.outerWidth-target.x)+"px; ";
+    } else {
+      str += "left: "+target.x+"px; ";
+    }
+    if (target.y > window.outerHeight-340) {
+      str += "bottom: "+(window.outerHeight-target.y)+"px; ";
+    } else {
+      str += "top: "+target.y+"px; ";
+    }
+    console.log(str);
+    this.element.setAttribute("style",str);
+    this.element.classList.remove("hidden");
+  };
+  output.hide = function() { this.element.classList.add("hidden") };
+  Object.keys(elements).map(e => {
+    Object.defineProperty(output,e,{ set: function(value) {
+      this.element.querySelector(elements[e]).innerText = value;
+    }});
+    output.element.append(document.createElement(elements[e]));
+  });
+  output.hide();
+  output.element.addEventListener("click",() => { output.hide(); });
+  parent.append(output.element);
+  return output;
+});
+
+class Gallery {
+  constructor(parentElement,genre=false) {
+    this.parent = parentElement;
+    this.status = {currentGrid:[]};
+    this.zoom = 12.5;
+    this.view = "grid";
+    this.ready = false;
+    this.gridStatus = [];
+    this.infobox = infobox(main);
+    if (genre) {
+      this.genre = genre;
+    }
+    [...document.querySelectorAll("button")].map(button => {
+      button.addEventListener("click",() => {
+        this[this.view][button.getAttribute("id")]();
+      });
+    });
+  }
+  grid = {
+    next: () => {
+      this.page++;
+    },
+    prev: () => {
+      this.page--;
+    }
+  }
+  player = {
+    next: () => {
+      this.trailer++;
+    },
+    prev: () => {
+      this.trailer--;
+    }
+  }
+  setCSS(selector,key,value) {
+    document.styleSheets[0].cssRules[
+    [...document.styleSheets[0].cssRules].indexOf(
+      [...document.styleSheets[0].cssRules]
+        .find(e => e.selectorText == selector))].style[key] = value;
+  }
+  setStatus(key,value,verbose=false) {
+    this.status[key] = value;
+    if (verbose) { console.log(key,this.status[key]); }
+  }
+  set genre(value) {
+    this.setStatus("genre",value);
+    this.page = 0;
+  }
+  set page(value) {
+    let start = 1;
+    try {
+      if (this.status.page < value) {
+        start = (this.status.count+this.status.start || 1)
+      } else {
+        start = (this.status.start-this.status.count || 1)
+      }
+    } catch {
+      console.log("page undefined");
+    }
+    this.setStatus("page",Math.ceil(start/this.status.count));
+    this.show(this.status.count,start);
+    if (this.status.page > 1) {
+      document.querySelector("#prev").classList.remove("hidden");
+    } else {
+      document.querySelector("#prev").classList.add("hidden");
+    }
+  }
+  set zoom(value) {
+    this.setStatus("zoom",value);
+    this.columns = Math.floor(100/this.zoom);
+    this.rows = Math.floor((100*(window.outerHeight/window.outerWidth))
+      /(this.zoom/0.683));
+    this.status.count = this.rows*this.columns;
+    this.setCSS("main","grid-template-columns","repeat("+this.columns+", 1fr)");
+    this.setCSS("img","width",this.zoom+"vw"); 
+    this.refresh();
+  }
+  set trailer(item_id) {
+    this.view = "player";
+    item_id = Math.max(0,item_id);
+    this.setStatus("trailer",item_id);
+    this.playTrailer(item_id);
+    if (item_id > 0) {
+      document.querySelector("#prev").classList.remove("hidden");
+    } else {
+      document.querySelector("#prev").classList.add("hidden");
+    }
+  }
+  get genre() {
+    return this.status["genre"];
+  }
+  get trailer() {
+    return this.status["trailer"];
+  }
+  get page() {
+    return this.status["page"];
+  }
+  get zoom() {
+    return this.status["zoom"];
+  }
+  refresh() {
+    if (([...this.parent.querySelectorAll("img")].length > 0)
+      && (this.status.count > [...this.parent.querySelectorAll("img")].length)
+      && this.ready) {
+      console.log("refreshing...");
+      this.show(this.status.count,this.status.start);
+    }
+  }
+  async show(count,start) {
+    this.ready = false;
+    this.setStatus("count",count);
+    this.setStatus("start",start); 
+    let imdb = await fetch("./list?genre="+this.genre+"&sort=boxoffice_gross_us,desc&count="+this.status.count+"&start="+this.status.start);
+    imdb = await imdb.json();
+    [...this.parent.querySelectorAll("img")].map(e => {
+      if (!imdb.some(movie => movie.cover === e.src)) {
+        e.remove();
+      }
+    });
+    imdb = imdb.filter(e => e.cover.indexOf("nopicture") < 0).map((e,i) => {
+      let currentPoster = [...this.parent.querySelectorAll("img")].some(image => image.src == e.cover);
+      if (!currentPoster) {
+        let img = document.createElement("img");
+        let promise_resolve;
+        this.gridStatus[i] = new Promise((resolve,reject) => { promise_resolve = resolve; });
+        img.setAttribute("alt",e.title);
+        img.addEventListener("click",() => {
+          this.trailer = i;
+        });
+        img.addEventListener("contextmenu",(event) => {
+          event.preventDefault();
+          this.infobox.title = e.title;
+          this.infobox.date = e.year;
+          this.infobox.real = e.director;
+          this.infobox.duration = e.duration;
+          this.infobox.genres = e.genres.map(g => (genres.find(f => f.value == g.toLowerCase()).label || g)).join(" | ");
+          this.infobox.resume = e.abstract;
+          this.infobox.show(img);
+        });
+        img.onload = () => { promise_resolve(); };
+        img.src = e.cover;
+        this.parent.append(img);
+      }
+      return e;
+    });
+    Promise.all(this.gridStatus).then(e => {
+      this.ready = true;
+      this.refresh();
+    });
+    this.setStatus("currentGrid",imdb);
+  }
+  YTplayer(url) {
+    [...main.querySelectorAll("section")].map(e => e.remove());
+    let section = document.createElement("section");
+    main.append(section);
+    let player = document.createElement("iframe");
+    player.setAttribute("width",parseInt(section.getBoundingClientRect().width)-200);
+    player.setAttribute("height",((parseInt(section.getBoundingClientRect().width)-200)/16)*9);
+    player.setAttribute("frameborder",0);
+    player.setAttribute("autoplay",true);
+    player.setAttribute("src","https://www.youtube.com/embed/"+url+"?autoplay=1");
+    section.append(player);  
+    section.addEventListener("click", (e) => {
+      [...main.querySelectorAll("section")].map(e => e.remove());
+      this.view = "grid";
+    });
+  }
+  async playTrailer(id) {
+    let trailer = await fetch("./trailer?title="+this.status.currentGrid[id].title);
+    trailer = await trailer.json();
+    trailer = trailer.trailer;
+    this.YTplayer(trailer);
+  }
+}
+
+
+
+let main = document.querySelector("main");
+let view;
+let zoomHandler = (event) => {
+  let scale = view.zoom;
+  if (event.deltaY < 0) {
+    scale += 0.1;
+  }
+  else {
+    scale -= 0.1;
+  }
+  scale = Math.min(Math.max(5, scale), 20);
+  view.zoom = scale;
+}
+document.onwheel = zoomHandler;
+genres.map(genre => {
+  let picture = document.createElement("p");
+  picture.setAttribute("class","genres");
+  picture.innerText = genre.picture;
+  picture.addEventListener("click", () => {
+    [...main.querySelectorAll("p")].map(e => e.remove());
+    document.querySelector("button").classList.remove("hidden");
+    view = new Gallery(main,genre.value);
+  });
+  main.append(picture)
+});
+/*(async () => {
+  let z = await fetch("./random");
+  z = await z.json();
+  YTplayer(z.trailer);
+})();
+*/
+
+let subs = async (title) => {
+  let subs = await fetch("./sub?title="+title);
+  subs = await subs.text();
+  if (subs != "") {
+    subs = subs.split("\n");
+    subs = subs.map(e => {
+      if (e.match(/(\d\d:){1,}\d\d,\d\d\d --> (\d\d:){1,}\d\d,\d\d\d/g)) {
+        e = e.replace(/,/g,".");
+      }
+      return e;
+    });
+    subs.unshift("\n");
+    subs.unshift("WEBVTT");
+    subs = subs.join("\n");
+    var blob = new Blob([subs], {type: "text/plain"});
+    return window.URL.createObjectURL(blob);
+  }
+}
+
+let playMovie = async (title) => {
+  let section = document.createElement("section");
+  main.append(section);
+  let player = document.createElement("video");
+  player.setAttribute("width",parseInt(section.getBoundingClientRect().width)-200);
+  let source = document.createElement("source");
+  source.setAttribute("src","./video?title="+title);
+  player.append(source);
+  player.setAttribute("autoplay","true");
+  player.setAttribute("controls","true");
+  section.append(player);  
+  let track = document.createElement("track");
+  track.setAttribute("src",await subs(title));
+  track.setAttribute("kind","subtitles");
+  player.append(track);
+  /*section.addEventListener("click", (e) => {
+    [...document.querySelectorAll("section")].map(e => e.remove());
+  });*/
+}
+
+</script>
+<!--<script type="module" src="front.js"></script>-->
+<button class="hidden" id="next">➡️</button>
+<button class="hidden" id="prev">⬅️️</button>
   </body>
 </html>
