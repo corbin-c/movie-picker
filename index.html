@@ -394,7 +394,7 @@ class Gallery {
     player.setAttribute("src","https://www.youtube.com/embed/"+url+"?autoplay=1");
     section.append(player);  
     section.addEventListener("click", (e) => {
-      [...main.querySelectorAll("section")].map(e => e.remove());
+      [...this.parent.querySelectorAll("section")].map(e => e.remove());
       this.view = "grid";
     });
   }
