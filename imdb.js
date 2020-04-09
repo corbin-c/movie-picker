@@ -43,6 +43,7 @@ const IMDB = {
     return url;
   },
   getIMDB: async (url) => {
+    console.log(url);
     url = await fetch(url,{headers: { "Accept-Language": "en" }});
     url = await url.text();
     let root = cheerio.load(utils.cleanWS(url));
@@ -52,25 +53,42 @@ const IMDB = {
       movie.cover = enhanceAmazonPoster(
         utils.querySelector(".lister-item-image a img",e,root).attribs.loadlate);
       movie.title = utils.render(utils.querySelector("h3 a",e,root));
-      movie.year = utils.render(utils.lastElementChild(utils.querySelector("h3",e,root)))
-        .split("(")[1].split(")")[0];
+      movie.year = utils.render(utils.lastElementChild(utils.querySelector("h3",e,root)));
+      try {
+        movie.year = movie.year.split("(")[1].split(")")[0];
+      } catch {
+        movie.year = "";
+      }
       utils.querySelectorAll("p",e,root).map((p,i) => {
         if (i == 0) {
-            p = utils.render(p).split("|");
-            if (p.length == 3) {
-              movie.duration = p[1];
-              movie.genres = p[2].split(",");
-            } else if (p.length == 2) {
-              movie.duration = p[0];
-              movie.genres = p[1].split(",");
-            } else if (p.length == 1) {
+            try {
+              p = utils.render(p).split("|");
+              if (p.length == 3) {
+                movie.duration = p[1];
+                movie.genres = p[2].split(",");
+              } else if (p.length == 2) {
+                movie.duration = p[0];
+                movie.genres = p[1].split(",");
+              } else if (p.length == 1) {
+                movie.duration = "";
+                movie.genres = p[0].split(",");
+              }
+            } catch {
               movie.duration = "";
-              movie.genres = p[0].split(",");
+              movie.genres = [];
             }
         } else if (i == 1) {
-          movie.abstract = utils.render(p);
+          try {
+            movie.abstract = utils.render(p);
+          } catch {
+            movie.abstract = "";
+          }
         } else if (i == 2) {
-          movie.director = utils.render(utils.querySelector("a", p, root));
+          try {
+            movie.director = utils.render(utils.querySelector("a", p, root));
+          } catch {
+            movie.director = "";
+          }
         }
       });
       for (let i in movie) {

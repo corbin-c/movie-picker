@@ -63,7 +63,6 @@ http.createServer(async function(req, res) {
   if (servedFiles.some(e => e.pathname == req.url)) {
     let served = servedFiles.find(e => e.pathname == req.url);
     res.writeHead(200, {"Content-Type": served.mime});
-    console.log("served: "+page.pathname);
     res.write(await getFile((req.url == "/") ? "index.html":req.url.slice(1)));
     res.end();
   } else if (page.pathname == "/video") {

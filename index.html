@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <header><h1></h1></header>
     <main>
     </main>
     <footer>
@@ -35,6 +34,87 @@ const genres = [{"picture":"🚓","label":"Action","value":"action"},
   {"picture":"⚔️","label":"Guerre","value":"war"},
   {"picture":"🏜️","label":"Western","value":"western"}];
 
+let displayGenres = (parent,callback) => {
+  genres.map(genre => {
+    let picture = document.createElement("p");
+    picture.setAttribute("class","genres");
+    picture.innerText = genre.picture;
+    picture.addEventListener("click", () => {
+      callback(genre.value);
+    });
+    parent.append(picture)
+  });
+};
+
+let settings = ((parent,methods) => {
+  let output = {
+    element: document.createElement("menu")
+  }
+  output.methods = methods;
+  output.toggle = function() { this.element.classList.toggle("hidden") };
+  output.updateGenres = function() {
+    let list = this.methods.getGenres();
+    console.log(list); 
+    [...this.element.querySelectorAll("div p")].map(e => {
+      let value = genres.find(g => g.picture == e.innerText).value;
+      if (list.indexOf(value) >= 0) {
+        e.classList.add("selected")
+      } else {
+        e.classList.remove("selected")
+      }
+    });
+  };
+  output.element.classList.add("hidden");
+  let filtr = document.createElement("h2");
+  filtr.innerText = "Ajouter un genre :"
+  output.element.append(filtr);
+  let container = document.createElement("div");
+  output.element.append(container);
+  parent.append(output.element);
+  //période temp
+  //tri
+  let home = document.createElement("p");
+  home.innerText = "🏠";
+  home.setAttribute("id","home");
+  let orderH = document.createElement("h2");
+  orderH.innerText = "Tri";
+  let sort_key = document.createElement("select");
+  let direction = document.createElement("select");
+  let createOpt = (select,value) => {
+    let opt = document.createElement("option");
+    opt.value = value;
+    opt.innerText = value;
+    select.append(opt);
+  } 
+  ["alpha","num_votes","boxoffice_gross_us","runtime","year"].map(e => {
+    createOpt(sort_key,e);
+  });
+  ["asc","desc"].map(e => {
+    createOpt(direction,e);
+  });
+  
+  home.addEventListener("click",() => { document.location.href = document.location.href });
+  let toggleGenre = (value) => {
+    output.methods.toggleGenre(value);
+    output.updateGenres();
+  }
+  displayGenres(container,toggleGenre);
+  output.updateGenres();
+  sort_key.addEventListener("change",() => {
+    methods.sort(sort_key.value,direction.value)
+  });
+  direction.addEventListener("change",() => {
+    methods.sort(sort_key.value,direction.value)
+  });
+  output.element.append(orderH);
+  output.element.append(sort_key);
+  output.element.append(direction);
+  let timeH = document.createElement("h2");
+  timeH.innerText = "Période";  
+  output.element.append(home);
+  return output;
+});
+
 let infobox = ((parent) => {
   const elements = {
     date:"time",
@@ -49,26 +129,43 @@ let infobox = ((parent) => {
   }
   output.show = function(target) {
     target = target.getBoundingClientRect();
-    target = {
-      x: target.left+target.width/2,
-      y: target.top+target.height/2
-    }
+    target.x = target.left+target.width/2;
+    target.y = target.top+target.height/2;
     let str = "";
-    if (target.x > window.outerWidth-340) {
-      str += "right: "+(window.outerWidth-target.x)+"px; ";
-    } else {
-      str += "left: "+target.x+"px; ";
+    let position = 0; 
+    /*
+    *       0-------1
+    *       |       |
+    *       |       |
+    *       3-------2
+    */
+    if (target.x > window.outerWidth-380) { //1 ou 2
+      str += "right: "+(window.innerWidth-target.x+target.width/4)+"px; ";
+      position++;
+    } else { //0 ou 3
+      str += "left: "+(target.x+target.width/4)+"px; ";
     }
-    if (target.y > window.outerHeight-340) {
-      str += "bottom: "+(window.outerHeight-target.y)+"px; ";
-    } else {
-      str += "top: "+target.y+"px; ";
+    if (target.y > window.outerHeight-380) { //2 ou 3
+      str += "bottom: "+(window.innerHeight-target.y+target.height/3)+"px; ";
+      position += (position == 1) ? 1:3;
+    } else { //0 ou 1
+      str += "top: "+(target.y+target.height/3)+"px; ";
     }
-    console.log(str);
-    this.element.setAttribute("style",str);
+    let border = ((radius,corner) => {
+      let corners = [...new Array(4).fill(radius)].map((e,i) => {
+        if (i == corner) {
+          e = 0;
+        }
+        return e;
+      });
+      return "border-radius: "+corners.join("px ")+"px;";
+    })(20,position);
+    this.element.setAttribute("style",str+border);
     this.element.classList.remove("hidden");
   };
-  output.hide = function() { this.element.classList.add("hidden") };
+  output.hide = function() { 
+    this.element.classList.add("hidden");
+  };
   Object.keys(elements).map(e => {
     Object.defineProperty(output,e,{ set: function(value) {
       this.element.querySelector(elements[e]).innerText = value;
@@ -82,18 +179,30 @@ let infobox = ((parent) => {
 });
 
 class Gallery {
-  constructor(parentElement,genre=false) {
+  constructor(parentElement,genre) {
     this.parent = parentElement;
     this.status = {currentGrid:[]};
+    this.sorted = "boxoffice_gross_us,desc"
+    this.more = false;
     this.zoom = 12.5;
     this.view = "grid";
     this.ready = false;
     this.gridStatus = [];
-    this.infobox = infobox(main);
-    if (genre) {
-      this.genre = genre;
-    }
+    this.genre = genre;
+    this.infobox = infobox(this.parent);
+    this.settings = settings(document.querySelector("body"),{
+      toggleGenre:(args) => {
+        this.toggleGenre.call(this,args);
+      },
+      sort:(key,direction) => {
+        this.setSort.call(this,key,direction)
+      },
+      getGenres:() => this.genre
+    });
     [...document.querySelectorAll("button")].map(button => {
+      if (button.getAttribute("id") != "prev") {
+        button.classList.remove("hidden");
+      }
       button.addEventListener("click",() => {
         this[this.view][button.getAttribute("id")]();
       });
@@ -105,6 +214,9 @@ class Gallery {
     },
     prev: () => {
       this.page--;
+    },
+    settings: () => {
+      this.settings.toggle();
     }
   }
   player = {
@@ -113,6 +225,9 @@ class Gallery {
     },
     prev: () => {
       this.trailer--;
+    },
+    settings: () => {
+      this.grid.settings();
     }
   }
   setCSS(selector,key,value) {
@@ -125,17 +240,39 @@ class Gallery {
     this.status[key] = value;
     if (verbose) { console.log(key,this.status[key]); }
   }
+  toggleGenre(value) {
+    let index = this.genre.indexOf(value);
+    if (index < 0) {
+      this.genre = [...this.genre,value];
+    } else {
+      this.status.genre.splice(index,1);
+      this.genre = this.status.genre;
+    }
+  }
+  setSort(key,direction) {
+    this.sorted = key+","+direction;
+    this.setStatus("start",null);
+    this.page = 0;
+  }
   set genre(value) {
+    value = (typeof value === "string") ? [value]:value;
     this.setStatus("genre",value);
+    this.setStatus("start",null);
     this.page = 0;
   }
   set page(value) {
     let start = 1;
     try {
-      if (this.status.page < value) {
-        start = (this.status.count+this.status.start || 1)
+      if ((typeof this.status.page === "unedfined")
+        || (this.status.start === null)) {
+        start = 1;
       } else {
-        start = (this.status.start-this.status.count || 1)
+        if (this.status.page < value) {
+          start = (this.status.count+this.status.start || 1)
+        } else {
+          start = (this.status.start-this.status.count || 1)
+        }
+        start = Math.max(start,1);
       }
     } catch {
       console.log("page undefined");
@@ -184,7 +321,7 @@ class Gallery {
   refresh() {
     if (([...this.parent.querySelectorAll("img")].length > 0)
       && (this.status.count > [...this.parent.querySelectorAll("img")].length)
-      && this.ready) {
+      && this.ready && this.more) {
       console.log("refreshing...");
       this.show(this.status.count,this.status.start);
     }
@@ -193,7 +330,7 @@ class Gallery {
     this.ready = false;
     this.setStatus("count",count);
     this.setStatus("start",start); 
-    let imdb = await fetch("./list?genre="+this.genre+"&sort=boxoffice_gross_us,desc&count="+this.status.count+"&start="+this.status.start);
+    let imdb = await fetch("./list?genre="+this.genre.join(",")+"&sort="+this.sorted+"&count="+this.status.count+"&start="+this.status.start);
     imdb = await imdb.json();
     [...this.parent.querySelectorAll("img")].map(e => {
       if (!imdb.some(movie => movie.cover === e.src)) {
@@ -207,11 +344,16 @@ class Gallery {
         let promise_resolve;
         this.gridStatus[i] = new Promise((resolve,reject) => { promise_resolve = resolve; });
         img.setAttribute("alt",e.title);
+        img.classList.add("loading");
         img.addEventListener("click",() => {
           this.trailer = i;
         });
-        img.addEventListener("contextmenu",(event) => {
+        img.addEventListener("contextmenu",async (event) => {
           event.preventDefault();
+          this.infobox.hide();
+          await ((t) => { return new Promise((resolve,reject) => {
+            setTimeout(resolve,t);
+          })})(400);
           this.infobox.title = e.title;
           this.infobox.date = e.year;
           this.infobox.real = e.director;
@@ -220,12 +362,20 @@ class Gallery {
           this.infobox.resume = e.abstract;
           this.infobox.show(img);
         });
-        img.onload = () => { promise_resolve(); };
+        img.onload = () => {
+          img.classList.remove("loading");
+          promise_resolve();
+        };
         img.src = e.cover;
         this.parent.append(img);
       }
       return e;
     });
+    if (imdb.length >= count ) {
+      this.more = true;
+    } else {
+      this.more = false;
+    }
     Promise.all(this.gridStatus).then(e => {
       this.ready = true;
       this.refresh();
@@ -233,9 +383,9 @@ class Gallery {
     this.setStatus("currentGrid",imdb);
   }
   YTplayer(url) {
-    [...main.querySelectorAll("section")].map(e => e.remove());
+    [...this.parent.querySelectorAll("section")].map(e => e.remove());
     let section = document.createElement("section");
-    main.append(section);
+    this.parent.append(section);
     let player = document.createElement("iframe");
     player.setAttribute("width",parseInt(section.getBoundingClientRect().width)-200);
     player.setAttribute("height",((parseInt(section.getBoundingClientRect().width)-200)/16)*9);
@@ -256,81 +406,35 @@ class Gallery {
   }
 }
 
-
-
-let main = document.querySelector("main");
-let view;
-let zoomHandler = (event) => {
-  let scale = view.zoom;
-  if (event.deltaY < 0) {
-    scale += 0.1;
+(() => {
+  let main = document.querySelector("main");
+  let view;
+  let zoomHandler = (event) => {
+    let scale = view.zoom;
+    if (event.deltaY < 0) {
+      scale += 0.1;
+    }
+    else {
+      scale -= 0.1;
+    }
+    scale = Math.min(Math.max(5, scale), 20);
+    view.zoom = scale;
   }
-  else {
-    scale -= 0.1;
-  }
-  scale = Math.min(Math.max(5, scale), 20);
-  view.zoom = scale;
-}
-document.onwheel = zoomHandler;
-genres.map(genre => {
-  let picture = document.createElement("p");
-  picture.setAttribute("class","genres");
-  picture.innerText = genre.picture;
-  picture.addEventListener("click", () => {
+  document.onwheel = zoomHandler;
+  displayGenres(main,(genre) => {
     [...main.querySelectorAll("p")].map(e => e.remove());
-    document.querySelector("button").classList.remove("hidden");
-    view = new Gallery(main,genre.value);
-  });
-  main.append(picture)
-});
+    view = new Gallery(main,genre);
+  });  
+})()
 /*(async () => {
   let z = await fetch("./random");
   z = await z.json();
   YTplayer(z.trailer);
 })();
 */
-
-let subs = async (title) => {
-  let subs = await fetch("./sub?title="+title);
-  subs = await subs.text();
-  if (subs != "") {
-    subs = subs.split("\n");
-    subs = subs.map(e => {
-      if (e.match(/(\d\d:){1,}\d\d,\d\d\d --> (\d\d:){1,}\d\d,\d\d\d/g)) {
-        e = e.replace(/,/g,".");
-      }
-      return e;
-    });
-    subs.unshift("\n");
-    subs.unshift("WEBVTT");
-    subs = subs.join("\n");
-    var blob = new Blob([subs], {type: "text/plain"});
-    return window.URL.createObjectURL(blob);
-  }
-}
-
-let playMovie = async (title) => {
-  let section = document.createElement("section");
-  main.append(section);
-  let player = document.createElement("video");
-  player.setAttribute("width",parseInt(section.getBoundingClientRect().width)-200);
-  let source = document.createElement("source");
-  source.setAttribute("src","./video?title="+title);
-  player.append(source);
-  player.setAttribute("autoplay","true");
-  player.setAttribute("controls","true");
-  section.append(player);  
-  let track = document.createElement("track");
-  track.setAttribute("src",await subs(title));
-  track.setAttribute("kind","subtitles");
-  player.append(track);
-  /*section.addEventListener("click", (e) => {
-    [...document.querySelectorAll("section")].map(e => e.remove());
-  });*/
-}
-
 </script>
 <!--<script type="module" src="front.js"></script>-->
+<button class="hidden" id="settings">⚙️️</button>
 <button class="hidden" id="next">➡️</button>
 <button class="hidden" id="prev">⬅️️</button>
   </body>
