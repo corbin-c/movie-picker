@@ -82,7 +82,7 @@ menu.hidden {
 }
 menu div .genres.selected {
   border-radius: 50%;
-  border: 2px solid red;
+  border: 2px solid var(--outline-color);
 }
 menu #home {
   font-size: 2.2em;
@@ -131,6 +131,11 @@ button {
 #prev {
   bottom: 20px;
   left: 20px;
+}
+#dice {
+  top: 20px;
+  left: 20px;
+  filter: grayscale(100%) invert(100%);
 }
 #settings {
   top: 20px;

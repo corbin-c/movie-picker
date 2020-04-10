@@ -39,7 +39,8 @@ let displayGenres = (parent,callback) => {
     let picture = document.createElement("p");
     picture.setAttribute("class","genres");
     picture.innerText = genre.picture;
-    picture.addEventListener("click", () => {
+    picture.addEventListener("click", (event) => {
+      event.stopPropagation();
       callback(genre.value);
     });
     parent.append(picture)
@@ -54,7 +55,6 @@ let settings = ((parent,methods) => {
   output.toggle = function() { this.element.classList.toggle("hidden") };
   output.updateGenres = function() {
     let list = this.methods.getGenres();
-    console.log(list); 
     [...this.element.querySelectorAll("div p")].map(e => {
       let value = genres.find(g => g.picture == e.innerText).value;
       if (list.indexOf(value) >= 0) {
@@ -80,19 +80,34 @@ let settings = ((parent,methods) => {
   orderH.innerText = "Tri";
   let sort_key = document.createElement("select");
   let direction = document.createElement("select");
-  let createOpt = (select,value) => {
+  let period = document.createElement("select");
+  let createOpt = (select,key,value) => {
     let opt = document.createElement("option");
     opt.value = value;
-    opt.innerText = value;
+    opt.innerText = key;
     select.append(opt);
-  } 
-  ["alpha","num_votes","boxoffice_gross_us","runtime","year"].map(e => {
-    createOpt(sort_key,e);
+  }; 
+  [ {key:"Box Office US",value:"boxoffice_gross_us"},
+    {key:"Alphabétique",value:"alpha"},
+    {key:"Nombre d'avis",value:"num_votes"},
+    {key:"Durée",value:"runtime"},
+    {key:"Année",value:"year"}  ].map(e => {
+    createOpt(sort_key,e.key,e.value);
   });
-  ["asc","desc"].map(e => {
-    createOpt(direction,e);
+  [ {key:"croissant",value:"asc"},
+    {key:"décroissant",value:"desc"}  ].map(e => {
+    createOpt(direction,e.key,e.value);
   });
-  
+  let periodH = document.createElement("h2");
+  periodH.innerText = "Période";
+  ["indifférent",...(new Array(7)).fill(1950)].map((e,i) => {
+    if (isNaN(e)) {
+      createOpt(period,e,"");
+    } else {
+      e = (e+i*10);
+      createOpt(period,"Années "+e,e+","+(9+e));
+    }
+  })
   home.addEventListener("click",() => { document.location.href = document.location.href });
   let toggleGenre = (value) => {
     output.methods.toggleGenre(value);
@@ -100,15 +115,25 @@ let settings = ((parent,methods) => {
   }
   displayGenres(container,toggleGenre);
   output.updateGenres();
-  sort_key.addEventListener("change",() => {
-    methods.sort(sort_key.value,direction.value)
+  period.addEventListener("change",(event) => {
+    methods.updatePeriod(period.value);
   });
-  direction.addEventListener("change",() => {
-    methods.sort(sort_key.value,direction.value)
+  sort_key.addEventListener("change",(event) => {
+    methods.sort(sort_key.value,direction.value);
+  });
+  direction.addEventListener("change",(event) => {
+    methods.sort(sort_key.value,direction.value);
+  });
+  output.element.addEventListener("click", function(event) {
+    if (["select","option"].indexOf(event.target.nodeName.toLowerCase()) < 0) {
+      output.toggle();
+    }
   });
   output.element.append(orderH);
   output.element.append(sort_key);
   output.element.append(direction);
+  output.element.append(periodH);
+  output.element.append(period);
   let timeH = document.createElement("h2");
   timeH.innerText = "Période";  
   output.element.append(home);
@@ -197,10 +222,13 @@ class Gallery {
       sort:(key,direction) => {
         this.setSort.call(this,key,direction)
       },
-      getGenres:() => this.genre
+      getGenres:() => this.genre,
+      updatePeriod:(period) => {
+        this.period = period;
+      }
     });
     [...document.querySelectorAll("button")].map(button => {
-      if (button.getAttribute("id") != "prev") {
+      if (["prev","dice"].indexOf(button.getAttribute("id")) < 0) {
         button.classList.remove("hidden");
       }
       button.addEventListener("click",() => {
@@ -217,7 +245,8 @@ class Gallery {
     },
     settings: () => {
       this.settings.toggle();
-    }
+    },
+    dice: () => {}
   }
   player = {
     next: () => {
@@ -228,6 +257,11 @@ class Gallery {
     },
     settings: () => {
       this.grid.settings();
+    },
+    dice: async () => {
+      let randomMovie = await fetch("./random");
+      randomMovie = await randomMovie.json();
+      this.YTplayer(randomMovie.trailer);      
     }
   }
   setCSS(selector,key,value) {
@@ -257,6 +291,11 @@ class Gallery {
   set genre(value) {
     value = (typeof value === "string") ? [value]:value;
     this.setStatus("genre",value);
+    this.setStatus("start",null);
+    this.page = 0;
+  }
+  set period(value) {
+    this.setStatus("period",value);
     this.setStatus("start",null);
     this.page = 0;
   }
@@ -318,6 +357,10 @@ class Gallery {
   get zoom() {
     return this.status["zoom"];
   }
+  get period() {
+    let period = this.status["period"];
+    return (period == "") ? "":"&date="+period;
+  }
   refresh() {
     if (([...this.parent.querySelectorAll("img")].length > 0)
       && (this.status.count > [...this.parent.querySelectorAll("img")].length)
@@ -330,7 +373,7 @@ class Gallery {
     this.ready = false;
     this.setStatus("count",count);
     this.setStatus("start",start); 
-    let imdb = await fetch("./list?genre="+this.genre.join(",")+"&sort="+this.sorted+"&count="+this.status.count+"&start="+this.status.start);
+    let imdb = await fetch("./list?genre="+this.genre.join(",")+"&sort="+this.sorted+"&count="+this.status.count+this.period+"&start="+this.status.start);
     imdb = await imdb.json();
     [...this.parent.querySelectorAll("img")].map(e => {
       if (!imdb.some(movie => movie.cover === e.src)) {
@@ -358,7 +401,11 @@ class Gallery {
           this.infobox.date = e.year;
           this.infobox.real = e.director;
           this.infobox.duration = e.duration;
-          this.infobox.genres = e.genres.map(g => (genres.find(f => f.value == g.toLowerCase()).label || g)).join(" | ");
+          try {
+            this.infobox.genres = e.genres.map(g => (genres.find(f => f.value == g.toLowerCase()).label || g)).join(" | ");
+          } catch {
+            this.infobox.genres = e.genres.join(" | ");
+          }
           this.infobox.resume = e.abstract;
           this.infobox.show(img);
         });
@@ -384,6 +431,7 @@ class Gallery {
   }
   YTplayer(url) {
     [...this.parent.querySelectorAll("section")].map(e => e.remove());
+    document.querySelector("#dice").classList.remove("hidden");
     let section = document.createElement("section");
     this.parent.append(section);
     let player = document.createElement("iframe");
@@ -395,6 +443,7 @@ class Gallery {
     section.append(player);  
     section.addEventListener("click", (e) => {
       [...this.parent.querySelectorAll("section")].map(e => e.remove());
+      document.querySelector("#dice").classList.add("hidden");
       this.view = "grid";
     });
   }
@@ -434,6 +483,7 @@ class Gallery {
 */
 </script>
 <!--<script type="module" src="front.js"></script>-->
+<button class="hidden" id="dice">🎲️️</button>
 <button class="hidden" id="settings">⚙️️</button>
 <button class="hidden" id="next">➡️</button>
 <button class="hidden" id="prev">⬅️️</button>
