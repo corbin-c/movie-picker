@@ -94,8 +94,8 @@ let settings = ((parent,methods) => {
     {key:"Année",value:"year"}  ].map(e => {
     createOpt(sort_key,e.key,e.value);
   });
-  [ {key:"croissant",value:"asc"},
-    {key:"décroissant",value:"desc"}  ].map(e => {
+  [ {key:"décroissant",value:"desc"},
+    {key:"croissant",value:"asc"}  ].map(e => {
     createOpt(direction,e.key,e.value);
   });
   let periodH = document.createElement("h2");
