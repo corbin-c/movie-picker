@@ -10,6 +10,10 @@ youTube.setKey(fs.readFileSync("youtube-api-key","utf8").split("\n")[0]);
 const servedFiles = [
   {pathname:"/",mime:"text/html"},
   {pathname:"/index.html",mime:"text/html; charset=utf-8"},
+  {pathname:"/genres.js",mime:"application/javascript"},
+  {pathname:"/infobox.js",mime:"application/javascript"},
+  {pathname:"/settings.js",mime:"application/javascript"},
+  {pathname:"/gallery.js",mime:"application/javascript"},
   {pathname:"/style.css",mime:"text/css"}
 ];
 
