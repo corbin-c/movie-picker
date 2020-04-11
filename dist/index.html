@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>La Bande à Nonce</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main>
+    </main>
+    <footer>
+    </footer>
+    <script type="module">
+import * as genresList from "./genres.js";
+import { infobox } from "./infobox.js";
+import { settings } from "./settings.js";
+import { Gallery } from "./gallery.js";
+
+(() => {
+  let main = document.querySelector("main");
+  let view;
+  let zoomHandler = (event) => {
+    let scale = view.zoom;
+    if (event.deltaY < 0) {
+      scale += 0.1;
+    }
+    else {
+      scale -= 0.1;
+    }
+    scale = Math.min(Math.max(4, scale), 20);
+    view.zoom = scale;
+  }
+  document.onwheel = zoomHandler;
+  genresList.show(main,(genre) => {
+    [...main.querySelectorAll("p")].map(e => e.remove());
+    view = new Gallery(main,genre,genresList,{infobox,settings});
+  });  
+})();
+    </script>
+<!--<script type="module" src="front.js"></script>-->
+    <button class="hidden" id="dice">🎲️️</button>
+    <button class="hidden" id="settings">⚙️️</button>
+    <button class="hidden" id="next">➡️</button>
+    <button class="hidden" id="prev">⬅️️</button>
+  </body>
+</html>
