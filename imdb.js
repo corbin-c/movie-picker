@@ -43,7 +43,6 @@ const IMDB = {
     return url;
   },
   getIMDB: async (url) => {
-    console.log(url);
     url = await fetch(url,{headers: { "Accept-Language": "en" }});
     url = await url.text();
     let root = cheerio.load(utils.cleanWS(url));
@@ -104,4 +103,4 @@ const IMDB = {
   }
 }
 
-module.exports = { IMDB }
+module.exports = IMDB;
