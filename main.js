@@ -98,7 +98,8 @@ server.route = {
 };
 server.route = {
   path:"/sub",
-  handler: async (req,res) => { 
+  handler: async (req,res) => {
+    let page = new URL("http://dummy.com"+req.url);
     await videoServer.isReady;
     if (videoServer[page.searchParams.get("title")]) {
       let movie = await videoServer[page.searchParams.get("title")];
@@ -113,6 +114,7 @@ server.route = {
 server.route = {
   path:"/list",
   handler: async (req,res) => {
+    let page = new URL("http://dummy.com"+req.url);
     server.json(await IMDB.getIMDB(IMDB.buildQuery(page.searchParams)))(req,res);
   }
 };
@@ -138,6 +140,7 @@ server.route = {
 server.route = {
   path:"/trailer",
   handler: async (req,res) => {
+    let page = new URL("http://dummy.com"+req.url);
     server.json({trailer:await youtubeSearch(page.searchParams.get("title"))})(req,res);
   }}
 server.start();
