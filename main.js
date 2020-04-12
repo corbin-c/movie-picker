@@ -58,14 +58,14 @@ server.route = {
   path:"/video",
   handler: async (req,res) => {
     let movie;
-    if (videoServer[page.searchParams.get("title")]) {
+    if (videoServer[req.page.searchParams.get("title")]) {
       await videoServer.isReady;
-      movie = videoServer[page.searchParams.get("title")];
+      movie = videoServer[req.page.searchParams.get("title")];
     } else {
-      videoServer[page.searchParams.get("title")] = {};
+      videoServer[req.page.searchParams.get("title")] = {};
       movie = await torrents.search(page.searchParams.get("title"));
       movie.torrent = await torrents.stream(movie.magnet);
-      videoServer[page.searchParams.get("title")] = movie;
+      videoServer[req.page.searchParams.get("title")] = movie;
       videoServer.makeReady();
     }
     let file = movie.torrent.files.find(e => isSomething(["avi","mkv","mp4"])(e.name))
@@ -99,10 +99,9 @@ server.route = {
 server.route = {
   path:"/sub",
   handler: async (req,res) => {
-    let page = new URL("http://dummy.com"+req.url);
     await videoServer.isReady;
-    if (videoServer[page.searchParams.get("title")]) {
-      let movie = await videoServer[page.searchParams.get("title")];
+    if (videoServer[req.page.searchParams.get("title")]) {
+      let movie = await videoServer[req.page.searchParams.get("title")];
       let file = movie.torrent.files.find(e => isSomething(["srt","sub"])(e.name));
       res.writeHead(200, {"Content-Type": "text/plain; charset=utf-8"})
       file.createReadStream().pipe(res)
@@ -114,8 +113,7 @@ server.route = {
 server.route = {
   path:"/list",
   handler: async (req,res) => {
-    let page = new URL("http://dummy.com"+req.url);
-    server.json(await IMDB.getIMDB(IMDB.buildQuery(page.searchParams)))(req,res);
+    server.json(await IMDB.getIMDB(IMDB.buildQuery(req.page.searchParams)))(req,res);
   }
 };
 server.route = {
@@ -140,7 +138,6 @@ server.route = {
 server.route = {
   path:"/trailer",
   handler: async (req,res) => {
-    let page = new URL("http://dummy.com"+req.url);
-    server.json({trailer:await youtubeSearch(page.searchParams.get("title"))})(req,res);
+    server.json({trailer:await youtubeSearch(req.page.searchParams.get("title"))})(req,res);
   }}
 server.start();
