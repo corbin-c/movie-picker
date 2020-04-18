@@ -2,6 +2,7 @@ const fs = require("fs");
 const YouTube = require("youtube-node");
 const youTube = new YouTube();
 const IMDB = require("./imdb.js");
+const Torrent = require("./torrent.js");
 const minimalServer = require("@corbin-c/minimal-server");
 
 youTube.setKey(fs.readFileSync("youtube-api-key","utf8").split("\n")[0]);
@@ -54,6 +55,12 @@ let videoServer = {
 videoServer.isReady = (new Promise((resolve,reject) => { videoServer.makeReady = resolve; }));
 let server = new minimalServer();
 server.enableStaticDir(true);
+server.route = {
+  path:"/torrent",
+  handler: async (req,res) => {
+    server.json({bestTorrent:await Torrent.search(req.page.searchParams.get("query"))})(req,res);
+  }
+}
 server.route = {
   path:"/video",
   handler: async (req,res) => {

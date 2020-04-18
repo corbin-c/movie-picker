@@ -50,13 +50,31 @@ export let infobox = ((parent,genres) => {
     this.element.classList.add("hidden");
   };
   Object.keys(elements).map(e => {
-    Object.defineProperty(output,e,{ set: function(value) {
-      this.element.querySelector(elements[e]).innerText = value;
-    }});
+    Object.defineProperty(output,e, {
+      set: function(value) {
+        this.element.querySelector(elements[e]).innerText = value;
+      },
+      get: function() {
+        return this.element.querySelector(elements[e]).innerText;
+      }
+    });
     output.element.append(document.createElement(elements[e]));
   });
   output.hide();
   output.element.addEventListener("click",() => { output.hide(); });
   parent.append(output.element);
+  
+  let magnet = document.createElement("h5");
+  magnet.innerText = "🧲";
+  magnet.addEventListener("click",async () => {
+    let torrent = await fetch("./torrent?query="+output.title+" "+output.date);
+    torrent = await torrent.json();
+    let elem = window.document.createElement("a");
+    elem.href = "magnet:?xt=urn:btih:"+torrent.bestTorrent.id;
+    document.body.appendChild(elem);
+    elem.click();        
+    document.body.removeChild(elem);
+  });
+  output.element.append(magnet);
   return output;
 });
