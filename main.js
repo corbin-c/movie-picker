@@ -72,7 +72,7 @@ server.route = {
       videoServer[req.page.searchParams.get("title")] = {};
       //movie = await torrents.search(page.searchParams.get("title"));
       movie = {};
-      movie.torrent = await Torrent.stream(page.searchParams.get("title"));
+      movie.torrent = await Torrent.stream(req.page.searchParams.get("title"));
       videoServer[req.page.searchParams.get("title")] = movie;
       videoServer.makeReady();
     }
