@@ -1,5 +1,6 @@
 const fetch = require("node-fetch");
 const cheerio = require("cheerio");
+const YouTube = new (require("youtube-node"))();
 const utils = require("./utils.js");
 
 class IMDB {
@@ -75,7 +76,7 @@ class IMDB {
   async fetchMovie(url) {
     let root = await this.fetcher(url, "movie");
     let list = utils.querySelectorAll(".lister-item","",root);
-    list = list.map(async e => {
+    list = list.map(e => {
       let movie = {};
       movie.cover = {};
       movie.cover.small = utils.querySelector(".lister-item-image a img",e,root).attribs.loadlate;
@@ -180,6 +181,30 @@ class IMDB {
       results[e] = url[e].value;
     })
     return results;
+  }
+  getTrailer(title,year) {
+    return new Promise((resolve, reject) => {
+      YouTube.search(title+" trailer "+year, 15, (error, result) => {
+        if (error) {
+          console.error(error)
+          reject("youtube error while getting trailer "+title+" "+year);
+        } else {
+          result = result.items.filter(e => typeof e.id !== "undefined");
+          result.forEach(e => {
+            let title = e.snippet.title.toLowerCase();
+            if (title.includes("theatrical")) {
+              e.rank = 2;
+            } else if (title.includes("official")) {
+              e.rank = 1;
+            } else {
+              e.rank = 0;
+            }
+          });
+          result = result.sort((a,b) => b.rank - a.rank);
+          resolve(result[0].id.videoId);
+        }
+      })
+    });
   }
 }
 
