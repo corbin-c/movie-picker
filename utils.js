@@ -42,4 +42,4 @@ let utils = {
   }
 }
 
-module.exports = { utils }
+module.exports = utils;
