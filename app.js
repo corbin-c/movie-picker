@@ -3,7 +3,7 @@ const IMDB = require("./imdb.js");
 const app = express();
 const port = process.env.PORT || 3000;
 const path = require("path");
-const dist = path.join(__dirname, "dist");
+const dist = path.join(__dirname, "build");
 
 app.use(express.static(dist));
 
