@@ -2,6 +2,7 @@ const fetch = require("node-fetch");
 const cheerio = require("cheerio");
 const YouTube = new (require("youtube-node"))();
 const utils = require("./utils.js");
+YouTube.setKey(process.ENV.YT_KEY);
 
 class IMDB {
   constructor() {
