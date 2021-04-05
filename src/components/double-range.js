@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./double-range.css";
 
+/* this component merges two input[type=range] to allow a min-max interval slider selection */
+
 function DoubleRange(props) {
   const { start, end, providedValue, onRangeChange } = props;
   const [state,setState] = useState({start, end});
