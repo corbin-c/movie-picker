@@ -1,0 +1,45 @@
+input[type=range] {
+  -webkit-appearance: none;
+  appearance: none;
+}
+.ranges:after {
+  content:"";
+  left: var(--indicatorLeft);
+  right: calc(var(--indicatorRight));
+  @apply block absolute bg-purple-600 h-2 top-1/3 z-20;
+}
+input[type=range]:focus {
+  outline: none;
+}
+input[name=end] {
+  @apply right-0;
+}
+input[name=start] {
+  --isAbove: min(.001rem, var(--wOrZ));
+  --isBelow: calc(.001rem - var(--isAbove));
+  --value: calc(1250 * var(--isBelow));
+  width: calc(100% - var(--value));
+  @apply left-0;
+}
+input[type=range]::-moz-range-thumb {
+  appearance: none;
+  cursor: pointer;
+  border-radius: 100%;
+  @apply w-5 h-5 border-0 bg-purple-600; 
+/*
+  1.25rem
+*/
+}
+input[type=range]::-webkit-slider-thumb {
+  appearance: none;
+  cursor: pointer;
+  border-radius: 100%;
+  @apply w-5 h-5 border-0 bg-purple-600;
+
+}
+input[type=range]::-ms-thumb {
+  appearance: none;
+  cursor: pointer;
+  border-radius: 100%;
+  @apply w-5 h-5 border-0 bg-purple-600;
+}
