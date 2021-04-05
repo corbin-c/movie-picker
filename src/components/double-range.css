@@ -15,11 +15,8 @@ input[name=end] {
   @apply right-0;
 }
 input[name=start] {
-  --isAbove: min(.001rem, var(--wOrZ));
-  --isBelow: calc(.001rem - var(--isAbove));
-  --value: calc(1250 * var(--isBelow));
-  width: calc(100% - var(--value));
-  @apply left-0;
+  z-index: var(--zi);
+  @apply left-0 w-full;
 }
 input[type=range]::-moz-range-thumb {
   appearance: none;
