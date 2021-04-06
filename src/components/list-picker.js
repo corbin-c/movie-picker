@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from "react";
 
+/* component to fetch a list & generate a checkboxes grid */
+
 function ListPicker(props) {
   const { source, handleChanges } = props;
   const [list,setListState] = useState([]);
+
   const listCheckBoxes = () => {
     return list.map(element => {
       return (<label
@@ -18,6 +21,7 @@ function ListPicker(props) {
       </label>)
     });
   }
+
   useEffect(() => {
     (async () => {
       let fetchedList = await fetch("/" + source);
@@ -28,9 +32,11 @@ function ListPicker(props) {
       setListState(list);
     })();
   },[]);
+
   useEffect(() => {
     handleChanges(list.filter(e => e.selected).map(e => e.key));
   });
+
   const selectElement = (e) => {
     const key = e.target.value;
     const selected = e.target.checked;
@@ -40,6 +46,7 @@ function ListPicker(props) {
       return ([...state]);
     });
   };
+
   return (<fieldset className="fieldgrid" onChange={ selectElement }>
       { listCheckBoxes() }
     </fieldset>)
