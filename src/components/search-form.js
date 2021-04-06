@@ -21,6 +21,12 @@ function SearchForm(props) {
     });
   }
 
+  const clearSearch = () => {
+    input.current.value = "";
+    setState({});
+    setResults([]);
+  }
+
   const selectResult = (name,id) => {
     input.current.value = name;
     setState({ name, id });
@@ -29,6 +35,7 @@ function SearchForm(props) {
 
   const performSearch = async (searchString) => {
     if (searchString.length > 0) {
+      setState({ name: searchString });
       console.log("searching...", path.type, searchString);
       let results = await fetch(path.root+searchString+path.type);
       results = await results.json();
@@ -53,7 +60,6 @@ function SearchForm(props) {
   }
   const triggerChange = (value) => {
     performSearch(value);
-    setState({ name: value });
   }
 
   useEffect(() => {
@@ -62,6 +68,10 @@ function SearchForm(props) {
 
   return (
     <fieldset className="relative">
+      <span
+        className={((result.name) ? "flex":"hidden") + " cursor-pointer absolute top-2.5 text-2xl text-purple-800 right-4 rounded-full bg-purple-200 h-5 w-5 items-center justify-center"}
+        onClick={ clearSearch }>
+      ×</span>
       <input
         ref={ input }
         onChange={ inputChange }
