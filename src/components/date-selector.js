@@ -1,13 +1,14 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import DoubleRange from "./double-range.js";
-import "./date-selector.css";
 
 /* this component allows the user to select date ranges for his movie 
  * discovery, using a slider or by decades */
 
-function DateSelector() {
+function DateSelector(props) {
+  const { handleChanges } = props;
   const startYear = 1890;
   const endYear = parseInt((new Date()).getFullYear());
+
   const decades = (() => {
     const start = Math.floor(startYear/10)*10;
     const end = Math.floor(endYear/10)*10;
@@ -17,6 +18,7 @@ function DateSelector() {
     }
     return decades;
   })();
+
   const initialDecadeState = (() => {
     let decadeState = {};
     decades.forEach(e => {
@@ -24,6 +26,7 @@ function DateSelector() {
     });
     return decadeState;
   })();
+
   const decadeRef = useRef(null);
   const [decadeState,setDecadeState] = useState(initialDecadeState);
   const [rangeState,setRangeState] = useState({start: startYear, end: endYear});
@@ -81,7 +84,11 @@ function DateSelector() {
       return state;
     });
   };
-  
+
+  useEffect(() => {
+    handleChanges(rangeState);
+  });
+
   return (
     <section>
       <DoubleRange
