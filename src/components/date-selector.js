@@ -81,6 +81,7 @@ function DateSelector() {
       return state;
     });
   };
+  
   return (
     <section>
       <DoubleRange
@@ -91,7 +92,7 @@ function DateSelector() {
       <fieldset
         ref={ decadeRef }
         onChange={ changeValues }
-        className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+        className="fieldgrid">
         { makeRadios() }
       </fieldset>
     </section>
