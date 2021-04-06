@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 
 function ListPicker(props) {
-  const { source } = props;
+  const { source, handleChanges } = props;
   const [list,setListState] = useState([]);
   const listCheckBoxes = () => {
     return list.map(element => {
@@ -28,6 +28,9 @@ function ListPicker(props) {
       setListState(list);
     })();
   },[]);
+  useEffect(() => {
+    handleChanges(list.filter(e => e.selected).map(e => e.key));
+  });
   const selectElement = (e) => {
     const key = e.target.value;
     const selected = e.target.checked;
