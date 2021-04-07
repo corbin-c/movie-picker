@@ -1,23 +1,28 @@
 import React, { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux"
 
 /* component to fetch a list & generate a checkboxes grid */
 
 function ListPicker(props) {
-  const { source, handleChanges } = props;
+  const { source } = props;
   const [list,setListState] = useState([]);
+  const dispatch = useDispatch();
+  const selected = useSelector(state => state.filters[source]) || [];
 
   const listCheckBoxes = () => {
     return list.map(element => {
       return (<label
-        htmlFor={ element.key }
-        className={ ((element.selected) ? "selected ":"") + "inline-block btn h-12 leading-10 m-1 capitalize" }
-        key={ element.key }>
+        htmlFor={ element }
+        className={ ((selected.includes(element)) ? "selected ":"") + "inline-block btn h-12 leading-10 m-1 capitalize" }
+        key={ element }>
         <input
+          onClick={ selectElement }
           name={ source }
           type="checkbox"
-          id={ element.key }
-          value={ element.key } />
-        { element.key.replace(/_/g, " ") }
+          id={ element }
+          checked={ (selected.includes(element)) }
+          value={ element } />
+        { element.replace(/_/g, " ") }
       </label>)
     });
   }
@@ -26,28 +31,22 @@ function ListPicker(props) {
     (async () => {
       let fetchedList = await fetch("/" + source);
       fetchedList = await fetchedList.json();
-      let list = fetchedList.map(e => {
-        return ({ key: e, selected: false });
-      });
-      setListState(list);
+      setListState(fetchedList);
     })();
-  },[]);
-
-  useEffect(() => {
-    handleChanges(list.filter(e => e.selected).map(e => e.key));
-  });
+  },[source]);
 
   const selectElement = (e) => {
+    console.log("click");
     const key = e.target.value;
-    const selected = e.target.checked;
-    setListState(state => {
-      let changedItem = state.find(item => item.key === key);
-      changedItem.selected = selected;
-      return ([...state]);
-    });
+    const actionType = (e.target.checked) ? "add":"remove";
+    const action = {
+      type: "filters/"+source+"/"+actionType,
+      payload: key
+    };
+    dispatch(action);
   };
 
-  return (<fieldset className="fieldgrid" onChange={ selectElement }>
+  return (<fieldset className="fieldgrid">
       { listCheckBoxes() }
     </fieldset>)
 }

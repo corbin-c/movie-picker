@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 
 function SearchForm(props) {
-  const { path, handleChanges } = props;
+  const { path, placeHolder, handleChanges } = props;
   const [resultsList,setResults] = useState([]);
   const [result,setState] = useState({});
   const timer = useRef(null);
@@ -78,8 +78,8 @@ function SearchForm(props) {
         onKeyDown={ handleKeyDown }
         type="text"
         className="textInput"
-        placeholder="John Doe"/>
-      <ul tabindex="1" className={ (resultsList.length === 0) ? "empty ":"" + "bottom-0 w-auto rounded-b-lg absolute left-0 right-0 overflow-hidden mx-2 border-2 border-solid border-purple-600 border-t-0" }>
+        placeholder={ placeHolder }/>
+      <ul tabindex="1" className={ ((resultsList.length === 0) ? "empty ":"") + "z-40 bottom-0 w-auto rounded-b-lg absolute left-0 right-0 overflow-hidden mx-2 border-2 border-solid border-purple-600 border-t-0" }>
         { displaySearchResults() }
       </ul>
     </fieldset>
