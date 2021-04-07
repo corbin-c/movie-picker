@@ -16,21 +16,17 @@ function DoubleRange(props) {
 
   const dispatch = useDispatch();
 
-  const dispatchChanges = (state) => {
-    dispatch({ type:"filters/dates/set", payload: state });
-  }
-
   useEffect(() => {
-    if ((selected.start !== previousGlobalState.start && selected.start !== internalState.start)
+    if ((internalState.start !== previousInternalState.start)
+      || (internalState.end !== previousInternalState.end)) {
+      dispatch({ type:"filters/dates/set", payload: internalState });
+      previousInternalStateRef.current = internalState;
+    } else if ((selected.start !== previousGlobalState.start && selected.start !== internalState.start)
       || (selected.end !== previousGlobalState.end && selected.end !== internalState.end)) {
       setState(state => selected);
-    } else if ((internalState.start !== previousInternalState.start)
-      || (internalState.end !== previousInternalState.end)) {
-      dispatchChanges(internalState);
-      previousInternalState.current = internalState;
     } else if ((selected.start !== previousGlobalState.start)
       || (selected.end !== previousGlobalState.end)) {
-      previousGlobalState.current = selected;
+      previousGlobalStateRef.current = selected;
     }
   });
 

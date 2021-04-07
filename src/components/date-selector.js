@@ -17,7 +17,7 @@ function DateSelector(props) {
       type: "filters/dates/set",
       payload: {start: startYear, end: endYear}
     });  
-  },[startYear,endYear]);
+  },[startYear,endYear,dispatch]);
 
   const decades = (() => {
     const start = Math.floor(startYear/10)*10;
