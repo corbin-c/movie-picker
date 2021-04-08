@@ -1,7 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useSelector } from "react-redux";
 
 function SearchForm(props) {
-  const { path, placeHolder, handleChanges } = props;
+  const { path, placeHolder, handleChanges, z, formId } = props;
+  const resultState = useSelector(state => state
+    .filters
+    [formId.split("/")[0]]
+    [formId.split("/")[1]]) 
+    || { name: "", id: "" };
+  const [searchString,setSearchString] = useState("");
   const [resultsList,setResults] = useState([]);
   const [result,setState] = useState({});
   const timer = useRef(null);
@@ -22,13 +29,12 @@ function SearchForm(props) {
   }
 
   const clearSearch = () => {
-    input.current.value = "";
+    setSearchString("");
     setState({});
     setResults([]);
   }
 
   const selectResult = (name,id) => {
-    input.current.value = name;
     setState({ name, id });
     setResults([]);
   }
@@ -36,7 +42,6 @@ function SearchForm(props) {
   const performSearch = async (searchString) => {
     if (searchString.length > 0) {
       setState({ name: searchString });
-      console.log("searching...", path.type, searchString);
       let results = await fetch(path.root+searchString+path.type);
       results = await results.json();
       setResults(results);
@@ -47,6 +52,7 @@ function SearchForm(props) {
   }
 
   const inputChange = (e) => {
+    setSearchString(e.target.value);
     clearTimeout(timer.current);
     timer.current = setTimeout(() => {
       triggerChange(e.target.value);
@@ -63,26 +69,36 @@ function SearchForm(props) {
   }
 
   useEffect(() => {
-    handleChanges(result);
-  }, [handleChanges, result]);
+    handleChanges({ ...result, source: formId });
+  }, [handleChanges, result, formId]);
+
+  useEffect(() => {
+    if (resultState.name !== "") {
+      setSearchString(resultState.name);
+    }
+  }, [setSearchString,resultState.name]);
 
   return (
-    <fieldset className="relative">
-      <span
-        className={((result.name) ? "flex":"hidden") + " cursor-pointer absolute top-2.5 text-2xl text-purple-800 right-4 rounded-full bg-purple-200 h-5 w-5 items-center justify-center"}
+    <div className="relative w-full">
+      <button
+        title="Clear search"
+        className={((searchString !== "") ? "flex":"hidden") + " cursor-pointer absolute top-2.5 text-2xl text-purple-800 right-4 rounded-full bg-purple-200 h-5 w-5 items-center justify-center"}
         onClick={ clearSearch }>
-      ×</span>
+      ×</button>
       <input
         ref={ input }
         onChange={ inputChange }
         onKeyDown={ handleKeyDown }
         type="text"
+        value={ searchString }
         className="textInput"
         placeholder={ placeHolder }/>
-      <ul tabindex="1" className={ ((resultsList.length === 0) ? "empty ":"") + "z-40 bottom-0 w-auto rounded-b-lg absolute left-0 right-0 overflow-hidden mx-2 border-2 border-solid border-purple-600 border-t-0" }>
+      <ul tabIndex="1" className={ ((resultsList.length === 0) ? "empty hidden ":"")
+        + "z-" + (40+(z*10 || 0))
+        + " bottom-0 w-auto rounded-b-lg absolute left-0 right-0 overflow-hidden mx-2 border-2 border-solid border-purple-600 border-t-0" }>
         { displaySearchResults() }
       </ul>
-    </fieldset>
+    </div>
   )
 }
 
