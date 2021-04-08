@@ -37,6 +37,7 @@ function MovieGrid(props) {
   }
   
   const nextPage = async () => {
+    console.log("next");
     if (movies.length === 0 || loading) {
       return;
     }
@@ -159,7 +160,7 @@ function MovieGrid(props) {
       handleObserver,
       {
         rootMargin: "0px",
-        threshold: 1.0
+        threshold: [.0, 1.]
       }
     );
     const observer = observerRef.current;
@@ -183,11 +184,11 @@ function MovieGrid(props) {
   },[])
   
   return (
-    <main className={ (filtersView) ? "filtersVisible":"" }>
+    <main className={ ((filtersView) ? "filtersVisible ":"") + "relative w-screen min-h-screen" }>
       <section className="movie-grid">
         { makeGrid() }
       </section>
-      <div ref={ lastMovie }></div>
+      <div className="h-1 absolute bottom-0 right-0 left-0" ref={ lastMovie }></div>
     </main>
   )
 }
