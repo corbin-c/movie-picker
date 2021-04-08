@@ -183,7 +183,7 @@ function MovieGrid(props) {
   },[])
   
   return (
-    <main>
+    <main className={ (filtersView) ? "filtersVisible":"" }>
       <section className="movie-grid">
         { makeGrid() }
       </section>
