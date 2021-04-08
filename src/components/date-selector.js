@@ -1,11 +1,11 @@
 import React, { useEffect } from "react";
 import DoubleRange from "./double-range.js";
-import { useSelector, useDispatch } from "react-redux"
+import { useSelector, useDispatch } from "react-redux";
 
 /* this component allows the user to select date ranges for his movie 
  * discovery, using a slider or by decades */
 
-function DateSelector(props) {
+function DateSelector() {
   const dispatch = useDispatch();
   const dateState = useSelector(state => state.filters.dates);
 
