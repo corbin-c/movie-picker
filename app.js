@@ -1,15 +1,32 @@
 const express = require("express");
 const IMDB = require("./imdb.js");
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 8080;
 const path = require("path");
 const dist = path.join(__dirname, "build");
 
 app.use(express.static(dist));
+app.use(express.json({ type : "*/*" }));
 
-app.get("/search/:queryString", async (req, res, next) => {
+app.get("/awards", (req, res, next) => {
   try {
-    res.json(await IMDB.suggestions(req.params.queryString));
+    res.json(IMDB.AWARDS);
+  } catch(e) {
+    next(new Error(e));
+  }
+});
+
+app.get("/genres", (req, res, next) => {
+  try {
+    res.json(IMDB.GENRES);
+  } catch(e) {
+    next(new Error(e));
+  }
+});
+
+app.get("/search/:queryString/:type?", async (req, res, next) => {
+  try {
+    res.json(await IMDB.suggestions(req.params.queryString, req.params.type));
   } catch(e) {
     next(new Error(e));
   }
