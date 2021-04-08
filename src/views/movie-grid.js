@@ -96,7 +96,7 @@ function MovieGrid(props) {
       body.awards = filters.awards.join(",");      
     }
     if (filters.persons.p0.name !== "" || filters.persons.p1.name !== "") {
-      body.stars = cleverJoin(...filters.persons.map(e => e.id));
+      body.stars = cleverJoin(filters.persons.p0.id,filters.persons.p1.id);
     }
     previousFiltersRef.current = filters;
     body.count = count;
