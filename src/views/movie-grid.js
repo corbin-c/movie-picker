@@ -25,7 +25,7 @@ function MovieGrid(props) {
   
   const dispatch = useDispatch();
 
-  const startYear = 1890;
+  const startYear = 1900;
   const endYear = parseInt((new Date()).getFullYear());
   const WAIT_INTERVAL = 1500;
   const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
@@ -41,12 +41,14 @@ function MovieGrid(props) {
       return;
     }
     let start = movies.length+1;
-    queryBody.start = start;
-    setLoading(state => true);
-    let nextMovies = await fetchMovies(queryBody);
-    dispatch({ type: "movies/setBody", payload: queryBody });
-    dispatch({ type: "movies/nextPage", payload: nextMovies });
-    setLoading(state => false);
+    if (start > count) {
+      queryBody.start = start;
+      setLoading(state => true);
+      let nextMovies = await fetchMovies(queryBody);
+      dispatch({ type: "movies/setBody", payload: queryBody });
+      dispatch({ type: "movies/nextPage", payload: nextMovies });
+      setLoading(state => false);
+    }
   }
 
   const compareObjects = (obj1, obj2) => {
@@ -94,22 +96,7 @@ function MovieGrid(props) {
       body.awards = filters.awards.join(",");      
     }
     if (filters.persons.p0.name !== "" || filters.persons.p1.name !== "") {
-      let persons = [];
-      await Promise.all([filters.persons.p0,filters.persons.p1]
-        .map(async (e,i) => {
-          if (e.name !== "") {
-            if (e.id === "") {
-              e.id = await fetch("http://localhost:8080/search/"+e.name+"/names");
-              e.id = await e.id.json();
-              e.id = e.id[0].id;
-              filters.persons["p"+i].id = e.id;
-              dispatch({ type: "filters/persons/p"+i, payload: e});
-            }
-            persons.push(e.id);
-          }
-        })
-      );
-      body.persons = cleverJoin(...persons);
+      body.stars = cleverJoin(...filters.persons.map(e => e.id));
     }
     previousFiltersRef.current = filters;
     body.count = count;
