@@ -2,7 +2,7 @@ const fetch = require("node-fetch");
 const cheerio = require("cheerio");
 const YouTube = new (require("youtube-node"))();
 const utils = require("./utils.js");
-YouTube.setKey(process.ENV.YT_KEY);
+//~ YouTube.setKey(process.ENV.YT_KEY);
 
 class IMDB {
   constructor() {
@@ -72,7 +72,7 @@ class IMDB {
     let url = "https://v2.sg.media-imdb.com/suggestion/"+type+query[0].toLowerCase()+"/"+query+".json"
     url = await fetch(url);
     url = await url.json();
-    return url;
+    return url.d;
   }
   async fetchMovie(url) {
     let root = await this.fetcher(url, "movie");
@@ -88,7 +88,8 @@ class IMDB {
       movie.title = utils.trimSpaces(utils.render(movie.title));
       movie.year = utils.render(utils.lastElementChild(utils.querySelector("h3",e,root)));
       try {
-        movie.year = utils.trimSpaces(movie.year.split("(")[1].split(")")[0]);
+        movie.year = movie.year.split("(");
+        movie.year = utils.trimSpaces(movie.year[movie.year.length-1].split(")")[0]);
       } catch {
         movie.year = "";
       }
@@ -150,7 +151,7 @@ class IMDB {
       id = await this.suggestions(id,"names");
       //this is not a proper ID.
       //let's assume it's a name & find out its ID
-      id = id.d[0].id;
+      id = id[0].id;
     }
     let root = await this.fetcher(id+"/bio","bio");
     let person = { id };
