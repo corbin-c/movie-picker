@@ -22,7 +22,7 @@ function ListPicker(props) {
           id={ element }
           checked={ (selected.includes(element)) }
           value={ element } />
-        { element.replace(/_/g, " ") }
+        { element.replace(/_/g, " ").replace(" winner","") }
       </label>)
     });
   }
@@ -36,7 +36,6 @@ function ListPicker(props) {
   },[source]);
 
   const selectElement = (e) => {
-    console.log("click");
     const key = e.target.value;
     const actionType = (e.target.checked) ? "add":"remove";
     const action = {
