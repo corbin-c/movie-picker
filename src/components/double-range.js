@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useSelector, useDispatch } from "react-redux"
+import { useSelector, useDispatch } from "react-redux";
 
 import "./double-range.css";
 
@@ -79,12 +79,12 @@ function DoubleRange(props) {
   }
   return (
     <fieldset className="flex flex-wrap md:flex-nowrap flex-row justify-evenly mb-5 md:mb-2">
-      <span className="w-1/2 order-1 md:w-auto flex-grow text-left md:text-center mb-2 md:mb-0 pl-2 md:pl-0">{ internalState.start }</span>
+      <span className="w-1/2 order-1 md:w-auto flex-grow text-left md:text-center mb-2 md:mb-0 pl-2 md:pl-0 md:pr-2">{ internalState.start }</span>
       <div className="w-full order-3 md:order-2 md:w-5/6 relative ranges" style={ indicatorStyle }>
         { renderRange("start", startStyle) }
         { renderRange("end", endStyle) }
       </div>
-      <span className="w-1/2 order-2 md:order-3 md:w-auto flex-grow text-right md:text-center mb-2 md:mb-0 pr-2 md:pr-0">{ internalState.end }</span>
+      <span className="w-1/2 order-2 md:order-3 md:w-auto flex-grow text-right md:text-center mb-2 md:mb-0 pr-2 md:pr-0 md:pl-2">{ internalState.end }</span>
     </fieldset>
   )
 }
