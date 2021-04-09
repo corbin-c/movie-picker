@@ -9,7 +9,7 @@ function DateSelector() {
   const dispatch = useDispatch();
   const dateState = useSelector(state => state.filters.dates);
 
-  const startYear = 1890;
+  const startYear = 1900;
   const endYear = parseInt((new Date()).getFullYear());
 
   useEffect(() => {
