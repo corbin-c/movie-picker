@@ -41,7 +41,7 @@ function SearchForm(props) {
 
   const performSearch = async (searchString) => {
     if (searchString.length > 0) {
-      setState({ name: searchString });
+      //~ setState({ name: searchString }); //maybe remove this, causes undesired side effects
       let results = await fetch(path.root+searchString+path.type);
       results = await results.json();
       setResults(results);
