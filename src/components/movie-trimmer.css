@@ -13,7 +13,7 @@
 #filters.filtersVisible {
   transform: translate3d(0, 0, 0);
 }
-@media (min-width: 1280px) {
+@media (min-width: 1586px) {
   #filters {
     width: 33vw;
   }
