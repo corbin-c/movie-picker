@@ -17,25 +17,38 @@ figcaption {
   }
 }
 .movie-grid {
-  padding-left: 0;
-  transition: .6s padding-left;
   @apply grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6;
 }
-main.filtersVisible .movie-grid {
+main.closed .movie-grid {
+  transition: .6s transform;
+  transform: translate3d(0, 0, 0);
+  width: 100vw;
+}
+main.opening .movie-grid {
+  transition: .6s transform;
+  transform: translate3d(var(--xshift), 0, 0);
+  width: 100vw;
+}
+main.open .movie-grid {
+  width: calc(100vw - var(--xshift));
+  margin-left: var(--xshift);
   @apply lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4;
 }
+main.open .movie-grid, main.opening .movie-grid {
+  --xshift: 0vw;
+}
 @media (min-width: 1586px) {
-  main.filtersVisible .movie-grid {
-    padding-left: 33vw;
+  main.open .movie-grid, main.opening .movie-grid {
+    --xshift: 33vw;
   }
 }
 @media (min-width: 1280px) and (max-width: 1536px) {
-  main.filtersVisible .movie-grid {
-    padding-left: 40vw;
+  main.open .movie-grid, main.opening .movie-grid  {
+    --xshift: 40vw;
   }
 }
 @media (min-width: 1024px) and (max-width: 1280px) {
-  main.filtersVisible .movie-grid {
-    padding-left: 50vw;
+  main.open .movie-grid, main.opening .movie-grid  {
+    --xshift: 50vw;
   }
 }

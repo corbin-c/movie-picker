@@ -9,6 +9,7 @@ import "./movie-grid.css";
 function MovieGrid(props) {
   const { filtersView } = props;
 
+  const [view, setView] = useState("closed");
   const [loading, setLoading] = useState(true);
   const [count, setCount] = useState(18);
   const [nextPageNeeded, setNextPageNeeded] = useState(false);
@@ -151,6 +152,17 @@ function MovieGrid(props) {
       setNextPageNeeded(state => false);
     }
   });
+
+  useEffect(() => {
+    if (filtersView) {
+      setView("opening");
+      setTimeout(() => {
+        setView("open")
+      },600);
+    } else {
+      setView("closed");
+    }
+  },[filtersView])
   
   useEffect(() => {
     if (observerRef.current) {
@@ -184,7 +196,7 @@ function MovieGrid(props) {
   },[])
   
   return (
-    <main className={ ((filtersView) ? "filtersVisible ":"") + "relative w-screen min-h-screen" }>
+    <main className={ view + " overflow-hidden relative w-screen min-h-screen" }>
       <section className="movie-grid">
         { makeGrid() }
       </section>
