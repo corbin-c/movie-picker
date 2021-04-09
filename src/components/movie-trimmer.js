@@ -13,7 +13,7 @@ function MovieTrimmer(props) {
   return (
     <section id="filters" className={ ((view) ? "filtersVisible":"") + " flex flex-col justify-between"}>
       <h1 className="text-center text-3xl font-bold text-purple-800 mt-2 mb-4">Filter movies by…</h1>
-      <form className="flex-grow">
+      <form className="flex-grow" onSubmit={ (e) => e.preventDefault() }>
         <details>
           <summary>Years</summary>
           <DateSelector />
