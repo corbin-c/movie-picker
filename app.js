@@ -8,7 +8,7 @@ const dist = path.join(__dirname, "build");
 app.use(express.static(dist));
 app.use(express.json({ type : "*/*" }));
 
-app.get("/awards", (req, res, next) => {
+app.get("/imdb/awards", (req, res, next) => {
   try {
     res.json(IMDB.AWARDS);
   } catch(e) {
@@ -16,7 +16,7 @@ app.get("/awards", (req, res, next) => {
   }
 });
 
-app.get("/genres", (req, res, next) => {
+app.get("/imdb/genres", (req, res, next) => {
   try {
     res.json(IMDB.GENRES);
   } catch(e) {
@@ -24,7 +24,7 @@ app.get("/genres", (req, res, next) => {
   }
 });
 
-app.get("/search/:queryString/:type?", async (req, res, next) => {
+app.get("/imdb/search/:queryString/:type?", async (req, res, next) => {
   try {
     res.json(await IMDB.suggestions(req.params.queryString, req.params.type));
   } catch(e) {
@@ -32,7 +32,7 @@ app.get("/search/:queryString/:type?", async (req, res, next) => {
   }
 });
 
-app.get("/randomMovie", async (req, res, next) => {
+app.get("/imdb/randomMovie", async (req, res, next) => {
   try {
     res.json(await IMDB.getMovies({
       sort: "user_rating,desc",
@@ -44,7 +44,7 @@ app.get("/randomMovie", async (req, res, next) => {
   }
 });
 
-app.get("/person/:queryString", async (req, res, next) => {
+app.get("/imdb/person/:queryString", async (req, res, next) => {
   try {
     res.json(await IMDB.getPerson(req.params.queryString));
   } catch(e) {
@@ -52,16 +52,15 @@ app.get("/person/:queryString", async (req, res, next) => {
   }
 });
 
-app.get("/enrich/:id", async (req, res, next) => {
+app.get("/imdb/enrich/:id", async (req, res, next) => {
   try {
     res.json(await IMDB.wikiDataSPARQL(req.params.id));
   } catch(e) {
     next(new Error(e));
   }
-  res.json(await IMDB.wikiDataSPARQL(req.params.id));
 });
 
-app.get("/movie/:title", async (req, res, next) => {
+app.get("/imdb/movie/title/:title", async (req, res, next) => {
   try {
     res.json(await IMDB.getMovies({
       "title": req.params.title
@@ -71,7 +70,15 @@ app.get("/movie/:title", async (req, res, next) => {
   }
 });
 
-app.get("/trailer/:title/:year", async (req, res, next) => {
+app.get("/imdb/movie/id/:id", async (req, res, next) => {
+  try {
+    res.json(await IMDB.getMovieById(req.params.id));
+  } catch(e) {
+    next(new Error(e));
+  }
+});
+
+app.get("/imdb/trailer/:title/:year", async (req, res, next) => {
   try {
     res.json(await IMDB.getTrailer(req.params.title,req.params.year));
   } catch(e) {
@@ -79,7 +86,7 @@ app.get("/trailer/:title/:year", async (req, res, next) => {
   }
 });
 
-app.post("/movies/", async (req, res, next) => {
+app.post("/imdb/movies/", async (req, res, next) => {
   try {
     res.json(await IMDB.getMovies(req.body));
   } catch(e) {
