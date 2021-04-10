@@ -10,7 +10,6 @@ function SearchForm(props) {
     || { name: "", id: "" };
   const [searchString,setSearchString] = useState("");
   const [resultsList,setResults] = useState([]);
-  const [result,setState] = useState({});
   const timer = useRef(null);
   const WAIT_INTERVAL = 1000;
   const ENTER_KEY = 13;
@@ -29,13 +28,11 @@ function SearchForm(props) {
 
   const clearSearch = () => {
     setSearchString("");
-    setState({});
     setResults([]);
     handleChanges({ name: "", id: "", source: formId });
   }
 
   const selectResult = (name,id) => {
-    setState({ name, id });
     setResults([]);
     handleChanges({ name, id , source: formId });
   }
@@ -46,7 +43,6 @@ function SearchForm(props) {
       results = await results.json();
       setResults(results);
     } else {
-      setState({});
       setResults([]);
     }
   }
