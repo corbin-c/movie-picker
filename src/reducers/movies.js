@@ -1,5 +1,16 @@
 const moviesReducer = (state, action) => {
   switch (action.type) {
+    case "movies/update":
+      let results = state.results.map(e => {
+        if (e.id === action.payload.id) {
+          e[action.payload.property] = action.payload.value;
+        }
+        return e;
+      })
+      return {
+        ...state,
+        results
+      }
     case "movies/nextPage":
       return {
         ...state,
