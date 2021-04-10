@@ -31,16 +31,17 @@ function SearchForm(props) {
     setSearchString("");
     setState({});
     setResults([]);
+    handleChanges({ name: "", id: "", source: formId });
   }
 
   const selectResult = (name,id) => {
     setState({ name, id });
     setResults([]);
+    handleChanges({ name, id , source: formId });
   }
 
   const performSearch = async (searchString) => {
     if (searchString.length > 0) {
-      //~ setState({ name: searchString }); //maybe remove this, causes undesired side effects
       let results = await fetch(path.root+searchString+path.type);
       results = await results.json();
       setResults(results);
@@ -66,10 +67,6 @@ function SearchForm(props) {
   const triggerChange = (value) => {
     performSearch(value);
   }
-
-  useEffect(() => {
-    handleChanges({ ...result, source: formId });
-  }, [handleChanges, result, formId]);
 
   useEffect(() => {
     if (resultState.name !== "") {
