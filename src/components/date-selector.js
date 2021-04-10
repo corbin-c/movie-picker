@@ -12,13 +12,6 @@ function DateSelector() {
   const startYear = 1900;
   const endYear = parseInt((new Date()).getFullYear());
 
-  useEffect(() => {
-    dispatch({
-      type: "filters/dates/set",
-      payload: {start: startYear, end: endYear}
-    });  
-  },[startYear,endYear,dispatch]);
-
   const decades = (() => {
     const start = Math.floor(startYear/10)*10;
     const end = Math.floor(endYear/10)*10;
