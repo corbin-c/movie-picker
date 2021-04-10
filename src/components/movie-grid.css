@@ -9,7 +9,7 @@ figure:hover figcaption {
 }
 figcaption {
   transition: .3s transform;
-  @apply absolute text-3xl p-3 opacity-80 bottom-0 left-0 right-0 text-white bg-black;
+  @apply absolute text-3xl p-3 opacity-80 bottom-0 left-0 -right-px text-yellow-50 bg-black;
 }
 @media (min-width: 768px) {
   figcaption {
@@ -19,36 +19,44 @@ figcaption {
 .movie-grid {
   @apply grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6;
 }
-main.closed .movie-grid {
-  transition: .6s transform;
+@keyframes x-shift {
+  from {
+    transform: translate3d(var(--xshift), 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);  
+  }
+}
+section.closed .movie-grid {
+  animation: .6s x-shift;
   transform: translate3d(0, 0, 0);
   width: 100vw;
 }
-main.opening .movie-grid {
+section.opening .movie-grid {
   transition: .6s transform;
   transform: translate3d(var(--xshift), 0, 0);
   width: 100vw;
 }
-main.open .movie-grid {
+section.open .movie-grid {
   width: calc(100vw - var(--xshift));
   margin-left: var(--xshift);
   @apply lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4;
 }
-main.open .movie-grid, main.opening .movie-grid {
+section .movie-grid {
   --xshift: 0vw;
 }
 @media (min-width: 1586px) {
-  main.open .movie-grid, main.opening .movie-grid {
+  section .movie-grid {
     --xshift: 33vw;
   }
 }
 @media (min-width: 1280px) and (max-width: 1536px) {
-  main.open .movie-grid, main.opening .movie-grid  {
+  section .movie-grid  {
     --xshift: 40vw;
   }
 }
 @media (min-width: 1024px) and (max-width: 1280px) {
-  main.open .movie-grid, main.opening .movie-grid  {
+  section .movie-grid  {
     --xshift: 50vw;
   }
 }

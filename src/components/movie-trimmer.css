@@ -1,19 +1,14 @@
 #filters {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100vh;
   overflow-y: auto;
   width: 100vw;
-  z-index: 1;
-  background: white;
   transform: translate3d(-100%, 0, 0);
   transition: .6s transform;
+  @apply bg-yellow-50 z-30 fixed top-0 left-0 h-screen;  
 }
 #filters.filtersVisible {
   transform: translate3d(0, 0, 0);
 }
-@media (min-width: 1586px) {
+@media (min-width: 1536px) {
   #filters {
     width: 33vw;
   }
@@ -45,11 +40,11 @@ details {
 */
   height: var(--height);
   transition: .6s height;
-  @apply w-auto m-3 mx-4 border-2 border-solid border-purple-600 rounded-lg text-purple-800;
+  @apply w-auto m-3 mx-4 border-2 border-solid border-red-700 rounded-lg text-red-900;
 }
 summary {
   list-style: none;
-  @apply relative z-10 bg-gradient-to-r from-purple-600 to-indigo-500 text-white cursor-pointer text-xl py-1 px-2;
+  @apply relative z-10 bg-gradient-to-r from-red-700 to-red-900 text-yellow-50 cursor-pointer text-xl py-1 px-2;
 }
 summary:before {
   content: "➜";

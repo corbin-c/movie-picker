@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import "./movie-grid.css";
 
@@ -77,7 +78,7 @@ function MovieGrid(props) {
   }
 
   const fetchMovies = async (body) => {
-    let results = await fetch("http://localhost:8080/movies", {
+    let results = await fetch("http://localhost:8080/imdb/movies", {
       method: "POST",
       body: JSON.stringify(body)
     });
@@ -91,6 +92,15 @@ function MovieGrid(props) {
       && filters.dates.start !== 0) {
       body.date = cleverJoin(filters.dates.start,filters.dates.end);
     }
+    if (filters.plot !== "") {
+      body.plot = filters.plot;
+    }
+    if (!(filters.runtime.start === 5 && filters.runtime.end === 240)) {
+      body.duration = cleverJoin(filters.runtime.start,(filters.runtime.end === 240) ? 1000:filters.runtime.end);
+    }
+    if (!(filters.rating.start === 0 && filters.rating.end === 10)) {
+      body.rating = cleverJoin(filters.rating.start,filters.rating.end);
+    }
     if (filters.genres.length > 0) {
       body.genre = filters.genres.join(",");
     }
@@ -99,6 +109,12 @@ function MovieGrid(props) {
     }
     if (filters.persons.p0.name !== "" || filters.persons.p1.name !== "") {
       body.stars = cleverJoin(filters.persons.p0.id,filters.persons.p1.id);
+    }
+    if (filters.sort.key !== "" || filters.sort.direction !== "") {
+      let sort = ["",""];
+      sort[0] = (filters.sort.key === "") ? "popularity":filters.sort.key;
+      sort[1] = (filters.sort.direction === "") ? "desc":filters.sort.direction;
+      body.sort = sort.join(",");
     }
     previousFiltersRef.current = filters;
     body.count = count;
@@ -120,15 +136,17 @@ function MovieGrid(props) {
       //loading
     }
     return movies.map((movie,i,a) => {
-      return (<figure key={ movie.id } >
-        <img
-          loading="lazy"
-          srcSet={ [movie.cover.small+" 80w", movie.cover.medium+" 400w"].join(", ") }
-          sizes={ "(max-width: 320px) 80px, 400px" }
-          src={ movie.cover.big }
-          alt={ "Movie poster for '" + movie.title + "'" } />
-        <figcaption> { movie.title + ((movie.year !== "") ? " ("+ movie.year +")" :"") }</figcaption>
-      </figure>)
+      return (<Link key={ movie.id } to={ "/movie/" + movie.id } title={ "View details about this movie: " + movie.title }>
+        <figure>
+          <img
+            loading="lazy"
+            srcSet={ [movie.cover.small+" 80w", movie.cover.medium+" 400w"].join(", ") }
+            sizes={ "(max-width: 320px) 80px, 400px" }
+            src={ movie.cover.big }
+            alt={ "Movie poster for '" + movie.title + "'" } />
+          <figcaption> { movie.title + ((movie.year !== "") ? " ("+ movie.year +")" :"") }</figcaption>
+        </figure>
+      </Link>)
     });
   }
   
@@ -196,12 +214,12 @@ function MovieGrid(props) {
   },[])
   
   return (
-    <main className={ view + " overflow-hidden relative w-screen min-h-screen" }>
-      <section className="movie-grid">
+    <section className={ view + " overflow-hidden relative w-screen min-h-screen" }>
+      <div className="movie-grid">
         { makeGrid() }
-      </section>
+      </div>
       <div className="h-1 absolute bottom-0 right-0 left-0" ref={ lastMovie }></div>
-    </main>
+    </section>
   )
 }
 

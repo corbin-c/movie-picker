@@ -13,10 +13,10 @@ const filtersReducer = (state, action) => {
         [domain]: state[domain].filter(e => e !== action.payload)
       }
     }
-  } else if (domain === "persons") {
+  } else if (["persons","sort"].includes(domain)) {
     return {
       ...state,
-      persons: { ...state.persons, [type]: action.payload }
+      [domain]: { ...state[domain], [type]: action.payload }
     }
   }
   if (type === "set") {

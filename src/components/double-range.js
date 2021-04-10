@@ -19,7 +19,7 @@ function DoubleRange(props) {
   useEffect(() => {
     if ((internalState.start !== previousInternalState.start)
       || (internalState.end !== previousInternalState.end)) {
-      dispatch({ type:"filters/dates/set", payload: internalState });
+      dispatch({ type:"filters/" + use + "/set", payload: internalState });
       previousInternalStateRef.current = internalState;
     } else if ((selected.start !== previousGlobalState.start && selected.start !== internalState.start)
       || (selected.end !== previousGlobalState.end && selected.end !== internalState.end)) {

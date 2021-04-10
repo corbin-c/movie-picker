@@ -29,7 +29,7 @@ function ListPicker(props) {
 
   useEffect(() => {
     (async () => {
-      let fetchedList = await fetch("/" + source);
+      let fetchedList = await fetch("/imdb/" + source);
       fetchedList = await fetchedList.json();
       setListState(fetchedList);
     })();
