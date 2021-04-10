@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
+import PosterItem from "./poster-grid-item.js";
 import "./movie-grid.css";
 
 /*
@@ -21,6 +21,7 @@ function MovieGrid(props) {
   
   const timer = useRef(null);
   const lastMovie = useRef(null);
+  const gridSection = useRef(null);
   const observerRef = useRef(null);
   const previousFiltersRef = useRef(filters);
   const previousFilters = previousFiltersRef.current;
@@ -113,7 +114,7 @@ function MovieGrid(props) {
     if (filters.sort.key !== "" || filters.sort.direction !== "") {
       let sort = ["",""];
       sort[0] = (filters.sort.key === "") ? "popularity":filters.sort.key;
-      sort[1] = (filters.sort.direction === "") ? "desc":filters.sort.direction;
+      sort[1] = (filters.sort.direction === "") ? "asc":filters.sort.direction;
       body.sort = sort.join(",");
     }
     previousFiltersRef.current = filters;
@@ -135,18 +136,8 @@ function MovieGrid(props) {
       && (loading))) {
       //loading
     }
-    return movies.map((movie,i,a) => {
-      return (<Link key={ movie.id } to={ "/movie/" + movie.id } title={ "View details about this movie: " + movie.title }>
-        <figure>
-          <img
-            loading="lazy"
-            srcSet={ [movie.cover.small+" 80w", movie.cover.medium+" 400w"].join(", ") }
-            sizes={ "(max-width: 320px) 80px, 400px" }
-            src={ movie.cover.big }
-            alt={ "Movie poster for '" + movie.title + "'" } />
-          <figcaption> { movie.title + ((movie.year !== "") ? " ("+ movie.year +")" :"") }</figcaption>
-        </figure>
-      </Link>)
+    return movies.map((movie) => {
+      return (<PosterItem movie={ movie } />)
     });
   }
   
@@ -173,12 +164,15 @@ function MovieGrid(props) {
 
   useEffect(() => {
     if (filtersView) {
-      setView("opening");
+      setView(state => "opening");
       setTimeout(() => {
-        setView("open")
+        const opening = [...gridSection.current.classList].includes("opening");
+        if (opening) {
+          setView(state => "open");
+        }
       },600);
     } else {
-      setView("closed");
+      setView(state => "closed");
     }
   },[filtersView])
   
@@ -214,7 +208,7 @@ function MovieGrid(props) {
   },[])
   
   return (
-    <section className={ view + " overflow-hidden relative w-screen min-h-screen" }>
+    <section ref={ gridSection }className={ view + " overflow-hidden relative w-screen min-h-screen" }>
       <div className="movie-grid">
         { makeGrid() }
       </div>
