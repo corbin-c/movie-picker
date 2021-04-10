@@ -3,7 +3,7 @@ import moviesReducer from "./reducers/movies.js";
 
 const initialState = {
   filters: {
-    dates: { start: 0, end: 0 },
+    dates: { start: 1900, end: parseInt((new Date()).getFullYear()) },
     rating: { start: 0, end: 10 },
     runtime: { start: 5, end: 240 },
     genres: [],
