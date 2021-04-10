@@ -26,7 +26,7 @@ class IMDB {
     };
     this.SUGGESTIONS_TYPES = ["names","titles"];
     this.SORT_KEYS = [
-      "alpha","num_votes","boxoffice_gross_us","runtime","year"
+      "alpha","num_votes","boxoffice_gross_us","moviemeter","runtime","year"
     ];
     this.GENRES = ["action","adventure","animation","biography","comedy",
       "crime","documentary","drama","family","fantasy","film-noir",
@@ -73,6 +73,19 @@ class IMDB {
     url = await fetch(url);
     url = await url.json();
     return url.d;
+  }
+  async getMovieById(id) {
+    let suggestion = await this.suggestions(id,"titles");
+    let movie = {};
+    suggestion = suggestion[0];
+    movie.cover = { big: suggestion.i.imageUrl };
+    movie.id = suggestion.id;
+    movie.title = suggestion.l;
+    movie.year = suggestion.y;
+    movie.rating = "";
+    movie.abstract = "";
+    movie.roles = suggestion.s.split(",").map(e => ({ name: e }));
+    return movie;
   }
   async fetchMovie(url) {
     let root = await this.fetcher(url, "movie");
