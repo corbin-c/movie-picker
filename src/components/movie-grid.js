@@ -31,7 +31,6 @@ function MovieGrid(props) {
   const startYear = 1900;
   const endYear = parseInt((new Date()).getFullYear());
   const WAIT_INTERVAL = 1500;
-  const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
 
   const handleObserver = (event) => {
     if (event[0].isIntersecting) {
@@ -190,6 +189,7 @@ function MovieGrid(props) {
     const observer = observerRef.current;
     observer.observe(lastMovie.current);
     
+    const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
     const count = ((width) => {
       let gridCols = 1;
       const breakPoints = [1536, 1280, 1024, 768, 640];
