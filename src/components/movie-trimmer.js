@@ -34,11 +34,11 @@ function MovieTrimmer(props) {
         </details>
         <details>
           <summary>User rating</summary>
-          <DoubleRange use="rating" start="0" end="10" />
+          <DoubleRange use="rating" start={0} end={10} />
         </details>
         <details>
           <summary>Runtime</summary>
-          <DoubleRange use="runtime" start="5" end="240" />
+          <DoubleRange use="runtime" start={5} end={240} />
         </details>
         <details>
           <summary>Plot</summary>
