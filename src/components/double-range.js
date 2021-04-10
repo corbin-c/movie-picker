@@ -25,7 +25,7 @@ function DoubleRange(props) {
         type="range"
         step="1"
         style={ style }
-        className="appearance-none bg-gray-300 h-2 z-10 absolute top-1/3"
+        className="appearance-none bg-red-200 h-2 z-10 absolute top-1/3"
         name={ name }
         min={ (name === "end") ? selected.start:start }
         max={ end }
