@@ -9,7 +9,7 @@ class IMDB {
     this.URL = {
       root: "https://www.imdb.com/",
       search: {
-        movie: "search/title/?title_type=feature",
+        movie: "search/title/?title_type=feature&production_status=released",
         bio: "name/"
       },
       rating: "user_rating", //format: min,max
@@ -33,7 +33,7 @@ class IMDB {
       "game-show","history","horror","music","musical","mystery",
       "news","reality-tv","romance","sci-fi","sport","talk-show",
       "thriller","war","western"];
-    this.AWARDS = ["oscar_winner","emmy_winner",
+    this.AWARDS = ["oscar_winner",
       "golden_globe_winner","best_picture_winner","best_director_winner"];
   }
   buildQuery(parameters) {
