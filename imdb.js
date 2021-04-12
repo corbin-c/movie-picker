@@ -2,7 +2,7 @@ const fetch = require("node-fetch");
 const cheerio = require("cheerio");
 const YouTube = new (require("youtube-node"))();
 const utils = require("./utils.js");
-//~ YouTube.setKey(process.ENV.YT_KEY);
+YouTube.setKey(process.ENV.YT_KEY);
 
 class IMDB {
   constructor() {
@@ -10,7 +10,9 @@ class IMDB {
       root: "https://www.imdb.com/",
       search: {
         movie: "search/title/?title_type=feature&production_status=released",
-        bio: "name/"
+        bio: "name/",
+        videoSearch: "title/",
+        video: "videoplayer/"
       },
       rating: "user_rating", //format: min,max
       title: "title",
@@ -57,10 +59,13 @@ class IMDB {
       return (typeof url !== "string") ? url[0]:url;
     }
   }
-  async fetcher(url,type) {
+  async fetcher(url,type,raw=false) {
     url = this.URL.root + this.URL.search[type] + url;
     url = await fetch(url,{headers: { "Accept-Language": "en" }});
     url = await url.text();
+    if (raw) {
+      return url;
+    }
     return cheerio.load(utils.cleanWS(url));
   }
   async suggestions(query,type) {
@@ -138,6 +143,9 @@ class IMDB {
           } catch {
             movie.abstract = "";
           }
+          if (movie.abstract.toLowerCase() === "add a plot") {
+            movie.abstract = "";
+          }
         } else if (i == 2) {
           movie.roles = [];
           let roles = utils.querySelectorAll("*", p, root);
@@ -168,10 +176,12 @@ class IMDB {
     }
     let root = await this.fetcher(id+"/bio","bio");
     let person = { id };
-    person.picture = {};
-    person.picture.small = utils.querySelector(".poster","",root).attribs.src;
-    person.picture.medium = this.enhanceAmazonPoster(person.picture.small);
-    person.picture.big = this.enhanceAmazonPoster(person.picture.small,true);
+    try {
+      person.picture = {};
+      person.picture.small = utils.querySelector(".poster","",root).attribs.src;
+      person.picture.medium = this.enhanceAmazonPoster(person.picture.small);
+      person.picture.big = this.enhanceAmazonPoster(person.picture.small,true);
+    } catch {};
     person.name = utils.trimSpaces(
       utils.render(
         utils.querySelector(".subpage_title_block .parent h3 a","",root)
@@ -197,12 +207,28 @@ class IMDB {
     })
     return results;
   }
-  getTrailer(title,year) {
+  async getImdbTrailer(id) {
+    try {
+      let trailer = await this.fetcher(id+"/videogallery/content_type-trailer/","videoSearch");
+      trailer = utils.querySelector("#main .search-results li a","",trailer).attribs.href;
+      trailer = await this.fetcher(trailer.split("/")[2],"video",true);
+      trailer = trailer.split(`{\\"definition\\":\\"480p\\",\\"mimeType\\":\\"video/mp4\\",\\"url\\":\\"`)[1].split('\\"}')[0];
+      return trailer;
+    } catch {
+      throw "unable to retrieve video from IMDB";
+    }
+  }
+  getTrailer(title,year,id) {
     return new Promise((resolve, reject) => {
       YouTube.search(title+" trailer "+year, 15, (error, result) => {
         if (error) {
-          console.error(error)
-          reject("youtube error while getting trailer "+title+" "+year);
+          console.error(error,title,year)
+          //fallback to imdb trailer
+          this.getImdbTrailer(id).then(e => {
+            resolve({"imdb":e});
+          }).catch(() => {
+            reject("no video found");
+          });
         } else {
           result = result.items.filter(e => typeof e.id !== "undefined");
           result.forEach(e => {
@@ -216,7 +242,7 @@ class IMDB {
             }
           });
           result = result.sort((a,b) => b.rank - a.rank);
-          resolve(result[0].id.videoId);
+          resolve({"youtube":result[0].id.videoId});
         }
       })
     });
