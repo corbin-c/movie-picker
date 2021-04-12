@@ -78,9 +78,9 @@ app.get("/imdb/movie/id/:id", async (req, res, next) => {
   }
 });
 
-app.get("/imdb/trailer/:title/:year", async (req, res, next) => {
+app.get("/imdb/trailer/:title/:year/:id", async (req, res, next) => {
   try {
-    res.json(await IMDB.getTrailer(req.params.title,req.params.year));
+    res.json(await IMDB.getTrailer(req.params.title,req.params.year,req.params.id));
   } catch(e) {
     next(new Error(e));
   }
@@ -94,17 +94,15 @@ app.post("/imdb/movies/", async (req, res, next) => {
   }
 });
 
+app.get('*', (req,res) =>{
+});
+
 app.get("*", function (req, res, next) {
-  const error = new Error("File not found");
-  error.statusCode = 404;
-  next(error);
+  res.sendFile(path.join(dist, "index.html"));
 });
 
 app.use(function(err, req, res, next) {
   if (!err.statusCode) err.statusCode = 500;
-  if (err.statusCode === 404) {
-    return res.status(404).sendFile(path.join(dist, "index.html"));;
-  }
   return res
     .status(err.statusCode)
     .json({ error: err.toString() });
