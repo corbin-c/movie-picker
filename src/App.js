@@ -1,13 +1,9 @@
 import store from "./store.js";
-import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import GridView from "./views/grid-view.js";
 import MovieView from "./views/movie-view.js";
 import PersonView from "./views/person-view.js";
 import "./App.css";
-
-const unsubscribe = store.subscribe(() =>
-  console.log('State after dispatch: ', store.getState())
-)
 
 function App() {
   return (
@@ -19,7 +15,7 @@ function App() {
           <Route path="/movie/:id">
             <MovieView />
           </Route>
-          <Route path="/person">
+          <Route path="/person/:id">
             <PersonView />
           </Route>
         </Switch>
