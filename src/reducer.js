@@ -1,3 +1,4 @@
+import listsReducer from "./reducers/lists.js";
 import filtersReducer from "./reducers/filters.js";
 import moviesReducer from "./reducers/movies.js";
 
@@ -18,6 +19,10 @@ const initialState = {
     },
     plot: ""
   },
+  lists: {
+    awards: [],
+    genres: []
+  },
   movies: {
     body: {},
     results: []
@@ -25,8 +30,12 @@ const initialState = {
 }
 
 export default function rootReducer(state = initialState, action) {
+  if (action.reset) {
+    state = {...state, filters: initialState.filters, movies: initialState.movies };
+  }
   return {
-    filters: filtersReducer(state.filters,action),
-    movies: moviesReducer(state.movies, action)
+    filters: filtersReducer(state.filters,action,initialState.filters),
+    movies: moviesReducer(state.movies, action),
+    lists: listsReducer(state.lists, action)
   }
 }
