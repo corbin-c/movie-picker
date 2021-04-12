@@ -11,8 +11,8 @@ function MovieGrid(props) {
   const { filtersView } = props;
 
   const [view, setView] = useState("closed");
-  const [loading, setLoading] = useState(true);
-  const [count, setCount] = useState(18);
+  const [loading, setLoading] = useState(false);
+  const [count, setCount] = useState(false);
   const [nextPageNeeded, setNextPageNeeded] = useState(false);
   
   const movies = useSelector(state => state.movies.results);
@@ -31,6 +31,7 @@ function MovieGrid(props) {
   const startYear = 1900;
   const endYear = parseInt((new Date()).getFullYear());
   const WAIT_INTERVAL = 1500;
+  const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
 
   const handleObserver = (event) => {
     if (event[0].isIntersecting) {
@@ -39,12 +40,14 @@ function MovieGrid(props) {
   }
   
   const nextPage = async () => {
-    console.log("next");
     if (movies.length === 0 || loading) {
       return;
     }
     let start = movies.length+1;
     if (start > count) {
+      if (queryBody.start === start) {
+        return;
+      }
       queryBody.start = start;
       setLoading(state => true);
       let nextMovies = await fetchMovies(queryBody);
@@ -86,7 +89,7 @@ function MovieGrid(props) {
     return results;
   }
 
-  const prepareFilters = async (filters) => {
+  const prepareFilters = (filters) => {
     let body = {};
     if (!(filters.dates.start === startYear && filters.dates.end === endYear)
       && filters.dates.start !== 0) {
@@ -117,7 +120,7 @@ function MovieGrid(props) {
       body.sort = sort.join(",");
     }
     previousFiltersRef.current = filters;
-    body.count = count;
+    body.count = count || getCount();
     dispatch({ type: "movies/setBody", payload: body });
     return body;
   }
@@ -136,25 +139,44 @@ function MovieGrid(props) {
       //loading
     }
     return movies.map((movie) => {
-      return (<PosterItem movie={ movie } />)
+      return (<PosterItem key={ movie.id } movie={ movie } vw={ vw } />)
     });
   }
-  
-  useEffect(() => {
+
+  const getCount = () => {
+    let gridCols = 1;
+    const breakPoints = [1536, 1280, 1024, 768, 640];
+    for (let i in breakPoints) {
+      if (vw > breakPoints[i]) {
+        gridCols = 6-i;
+        break;
+      }
+    }
+    setCount(gridCols*3);
+    return gridCols*3;
+  }
+
+  const tryToLoad = () => {
     /* 
      * we wait for some time to avoid fetching to many times,
      * and compare with previous filters to avoid
      * fetching again the same data
      */
+    const delay = (movies.length === 0) ? 0 : WAIT_INTERVAL;
     clearTimeout(timer.current);
     timer.current = setTimeout(async () => {
-      if (!compareObjects(filters, previousFilters)) {
+      if (((!compareObjects(filters, previousFilters)) || (movies.length === 0))
+        && (!loading)) {
         setLoading(state => true);
-        let movies = await fetchMovies(await prepareFilters(filters));
+        let movies = await fetchMovies(prepareFilters(filters));
         dispatch({ type: "movies/setResults", payload: movies });
         setLoading(state => false);
       }
-    }, WAIT_INTERVAL);
+    }, delay);
+  }
+
+  useEffect(() => {
+    tryToLoad();
     if (nextPageNeeded) {
       nextPage();
       setNextPageNeeded(state => false);
@@ -176,6 +198,8 @@ function MovieGrid(props) {
   },[filtersView])
   
   useEffect(() => {
+    document.title = "Movie Picker";
+    tryToLoad();
     if (observerRef.current) {
       observerRef.current.disconnect();
     }
@@ -188,31 +212,16 @@ function MovieGrid(props) {
     );
     const observer = observerRef.current;
     observer.observe(lastMovie.current);
-    
-    const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
-    const count = ((width) => {
-      let gridCols = 1;
-      const breakPoints = [1536, 1280, 1024, 768, 640];
-      for (let i in breakPoints) {
-        if (width > breakPoints[i]) {
-          gridCols = 6-i;
-          break;
-        }
-      }
-      return gridCols*3;
-    })(vw);
-    
-    setCount(count);
-    
+        
     return () => { observer.disconnect() };
   },[])
   
   return (
-    <section ref={ gridSection }className={ view + " overflow-hidden relative w-screen min-h-screen" }>
-      <div className="movie-grid">
+    <section ref={ gridSection } className={ view + " overflow-hidden w-screen" }>
+      <div className="min-h-screen movie-grid">
         { makeGrid() }
       </div>
-      <div className="h-1 absolute bottom-0 right-0 left-0" ref={ lastMovie }></div>
+      <div className={ ((movies.length < count) ? "hidden":"") + " h-1 mt-1"} ref={ lastMovie }></div>
     </section>
   )
 }
