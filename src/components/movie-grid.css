@@ -1,10 +1,7 @@
-figure {
+.movie-grid figure {
   @apply relative overflow-hidden;
 }
-figure img {
-  @apply border-0 object-cover h-full w-full;
-}
-figure:hover figcaption {
+.movie-grid figure:hover figcaption {
   transform: translate3d(0, 0, 0);
 }
 figcaption {
