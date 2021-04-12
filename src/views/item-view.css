@@ -1,0 +1,119 @@
+.item-view {
+  @apply text-yellow-50 w-screen;
+}
+.item-view header {
+  @apply my-5;
+}
+.item-view h1 {
+  @apply text-5xl font-bold text-center;
+}
+.item-view h2 {
+  @apply text-3xl text-center;
+}
+.item-view article {
+  grid-template-rows: 0fr 0fr 0fr 0fr;
+  @apply mx-5 grid gap-5 grid-cols-1 md:grid-cols-2;
+}
+.item-view.person article {
+  grid-template-rows: 0fr 0fr 0fr;
+}
+.item-view figure {
+  width: calc(100vw - 10rem);
+  align-self: start;
+  @apply row-span-1 md:row-span-4 h-auto md:w-full mx-auto;
+}
+.item-view.person figure {
+  @apply md:row-span-3;
+}
+.item-view img {
+  @apply h-full object-contain border-0;
+}
+.item-view p {
+  @apply col-start-1 row-start-2 md:col-start-2 md:row-start-1 text-lg;
+}
+.details-list {
+  @apply col-start-1 row-start-3 md:col-start-2 md:row-start-2 grid gap-5 text-lg grid-cols-2;
+}
+.details-list > li {
+  @apply flex items-center;
+}
+.details-list svg {
+  @apply fill-current inline mr-2;
+}
+.details-list > li > ul {
+  @apply flex flex-grow flex-wrap justify-around;
+}
+.details-list > li > ul > li {
+  @apply px-2;
+}
+.details-list a {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+}
+.details-list a::before, .details-list a::after {
+  content: "";
+  position: absolute;
+  height: .05em;
+  width: 100%;
+  bottom: .05em;
+  left: 0;
+  right: 0;
+  @apply bg-yellow-50;
+}
+.details-list a::after {
+  opacity: 1;
+  transition: transform .8s cubic-bezier(.23,1,.32,1);
+  transform: translateX(102%);
+}
+.details-list a::before {
+  transform: translateX(-102%);
+  opacity: 0;
+}
+.details-list a:hover::before {
+  transition: transform .8s cubic-bezier(.23,1,.32,1);
+  transform: translateX(0);
+  opacity: 1;
+}
+a:hover::after {
+  transition: none;
+  transform: translateX(0);
+  opacity: 0;
+}
+.links {
+  @apply text-lg flex flex-wrap justify-around items-start content-evenly;
+}
+.links a:active, .links button:active {
+  @apply bg-red-900 border-red-900;
+}
+.links a, .links button {
+  @apply m-2 inline-flex items-center rounded-lg border-2 border-solid border-yellow-50;
+  @apply text-center border-yellow-50 cursor-pointer;
+  @apply hover:bg-yellow-50 hover:text-black;
+  @apply active:bg-red-700 active:border-red-900 active:text-red-50 px-3 py-2;
+  transition: background .3s, border .3s, color .3s;
+}
+.links a svg, .links button svg {
+  @apply inline mr-2;
+}
+@media (min-width: 768px) {
+  .item-view article {
+    grid-template-rows: 0fr 0fr 0fr 0fr;
+  }
+  .item-view.person article {
+    grid-template-rows: 0fr 0fr 0fr;
+  }
+  .item-view figure {
+    height: calc(100vh - 10rem);
+  }
+}
+@media (min-width: 1280px) {
+  .item-view {
+    width: 85vw;
+    margin-left: 7.5vw;
+  }
+  .links {
+    padding-left: 15%;
+    padding-right: 15%; 
+  }
+}
