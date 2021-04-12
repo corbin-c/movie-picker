@@ -12,7 +12,6 @@ function SearchForm(props) {
   const [resultsList,setResults] = useState([]);
   const timer = useRef(null);
   const WAIT_INTERVAL = 1000;
-  const ENTER_KEY = 13;
 
   const displaySearchResults = () => {
     return resultsList.map((item,i) => {
@@ -55,7 +54,8 @@ function SearchForm(props) {
     }, WAIT_INTERVAL);
   }
   const handleKeyDown = (e) => {
-    if (e.keyCode === ENTER_KEY) {
+    if (e.key === "Enter") {
+      e.preventDefault();
       clearTimeout(timer.current);
       triggerChange(e.target.value);
     }
