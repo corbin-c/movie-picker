@@ -45,7 +45,7 @@ function MovieView() {
   }
 
   const fetchMovies = async (body) => {
-    let results = await fetch("http://localhost:8080/imdb/movies", {
+    let results = await fetch("/imdb/movies", {
       method: "POST",
       body: JSON.stringify(body)
     });
@@ -118,7 +118,7 @@ function MovieView() {
       if ((!movie.enriched) && (!enrichedError) && (movie.id)) {
         (async () => {
           setLoading(state => true);
-          let enrichedData = await fetch("http://localhost:8080/imdb/enrich/"+movie.id);
+          let enrichedData = await fetch("/imdb/enrich/"+movie.id);
           enrichedData = await enrichedData.json();
           if (!enrichedData.error) {
             movie.enriched = enrichedData;
@@ -142,7 +142,7 @@ function MovieView() {
       if ((!movie.trailer) && (!trailerError) && (movie.title)) {
         (async () => {
           setLoading(state => true);
-          let trailer = await fetch("http://localhost:8080/imdb/trailer/"+movie.title+"/"+movie.year+"/"+movie.id);
+          let trailer = await fetch("/imdb/trailer/"+movie.title+"/"+movie.year+"/"+movie.id);
           trailer = await trailer.json();
           if (!trailer.error) {
             movie.trailer = trailer;
@@ -168,7 +168,7 @@ function MovieView() {
   useEffect(() => {
     if (id === "random") {
       (async () => {
-        let movie = await fetch("http://localhost:8080/imdb/randomMovie");
+        let movie = await fetch("/imdb/randomMovie");
         movie = await movie.json();
         setMovie(state => movie[0]);
         setContext(state => false);
@@ -176,7 +176,7 @@ function MovieView() {
     } else {
       if (typeof movieSelector === "undefined") {
         (async () => {
-          let fetchedMovie = await fetch("http://localhost:8080/imdb/movie/id/"+id);
+          let fetchedMovie = await fetch("/imdb/movie/id/"+id);
           fetchedMovie = await fetchedMovie.json();
           if (fetchedMovie.error) {
             //REDIRECT TO 404

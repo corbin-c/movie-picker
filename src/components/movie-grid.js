@@ -81,7 +81,7 @@ function MovieGrid(props) {
   }
 
   const fetchMovies = async (body) => {
-    let results = await fetch("http://localhost:8080/imdb/movies", {
+    let results = await fetch("/imdb/movies", {
       method: "POST",
       body: JSON.stringify(body)
     });

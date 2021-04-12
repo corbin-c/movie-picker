@@ -18,7 +18,7 @@ function PersonView() {
     }
     if ((!person.enriched) && (person.id)){
       (async () => {
-        let enrichedData = await fetch("http://localhost:8080/imdb/enrich/"+person.id);
+        let enrichedData = await fetch("/imdb/enrich/"+person.id);
         enrichedData = await enrichedData.json();
         if (!enrichedData.error) {
           person.enriched = enrichedData;
@@ -30,7 +30,7 @@ function PersonView() {
 
   useEffect(() => {
     (async () => {
-      let person = await fetch("http://localhost:8080/imdb/person/"+id);
+      let person = await fetch("/imdb/person/"+id);
       person = await person.json();
       if (person.error) {
         //REDIRECT TO 404

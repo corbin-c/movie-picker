@@ -32,7 +32,7 @@ function PersonSelector() {
       formId="persons/p0"
       placeHolder="John Doe"
       handleChanges={ dispatchChanges }
-      path={{root: "http://localhost:8080/imdb/search/", type: "/names" }} />
+      path={{root: "/imdb/search/", type: "/names" }} />
     <button
       onClick={ () => setInputs(2) }
       title="Add another person"
@@ -46,7 +46,7 @@ function PersonSelector() {
       formId="persons/p1"
       placeHolder="Erika Mustermann"
       handleChanges={ dispatchChanges }
-      path={{root: "http://localhost:8080/imdb/search/", type: "/names" }} />
+      path={{root: "/imdb/search/", type: "/names" }} />
     <button
       onClick={ removePerson }
       title="Remove this person"
