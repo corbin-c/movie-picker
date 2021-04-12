@@ -1,0 +1,14 @@
+#sorter {
+  transition: .6s transform;
+}
+#sorter.sortVisible {
+  transform: translate3d(0, 0, 0);
+}
+@media (min-width: 1024px) {
+  #sorter {
+    --tw-translate-y: -100%;
+  }
+}
+#sorter select {
+  @apply self-stretch min-w-16 text-center bg-yellow-50 cursor-pointer text-xl;
+}
