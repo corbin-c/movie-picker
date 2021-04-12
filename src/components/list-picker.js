@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux"
 
 /* component to fetch a list & generate a checkboxes grid */
 
 function ListPicker(props) {
   const { source } = props;
-  const [list,setListState] = useState([]);
   const dispatch = useDispatch();
   const selected = useSelector(state => state.filters[source]) || [];
+  const list = useSelector(state => state.lists[source]) || [];
 
   const listCheckBoxes = () => {
     return list.map(element => {
@@ -28,12 +28,14 @@ function ListPicker(props) {
   }
 
   useEffect(() => {
-    (async () => {
-      let fetchedList = await fetch("/imdb/" + source);
-      fetchedList = await fetchedList.json();
-      setListState(fetchedList);
-    })();
-  },[source]);
+    if (list.length === 0) {
+      (async () => {
+        let fetchedList = await fetch("/imdb/" + source);
+        fetchedList = await fetchedList.json();
+        dispatch({ type: "lists/"+source, payload: fetchedList });
+      })();
+    }
+  },[list.length, source, dispatch]);
 
   const selectElement = (e) => {
     const key = e.target.value;
