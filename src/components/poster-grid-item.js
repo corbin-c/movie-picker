@@ -5,11 +5,11 @@ import MoviePoster from "./movie-poster.js";
 /* this component displays a clickable movie poster */
 
 function PosterItem(props) {
-  const { movie } = props
+  const { movie, vw } = props
   return (
-      <Link key={ movie.id } to={ "/movie/" + movie.id } title={ "View details about this movie: " + movie.title }>
+      <Link to={ "/movie/" + movie.id } title={ "View details about this movie: " + movie.title }>
         <figure>
-          <MoviePoster cover={ movie.cover } title={ movie.title } />
+          <MoviePoster classes="border-0 object-cover h-full w-full" cover={ movie.cover } size="medium" vw={ vw } title={ movie.title } />
           <figcaption> { movie.title + ((movie.year !== "") ? " ("+ movie.year +")" :"") }</figcaption>
         </figure>
       </Link>
