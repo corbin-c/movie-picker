@@ -34,7 +34,7 @@ export default function rootReducer(state = initialState, action) {
     state = {...state, filters: initialState.filters, movies: initialState.movies };
   }
   return {
-    filters: filtersReducer(state.filters,action,initialState.filters),
+    filters: filtersReducer(state.filters,action),
     movies: moviesReducer(state.movies, action),
     lists: listsReducer(state.lists, action)
   }
