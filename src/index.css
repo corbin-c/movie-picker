@@ -30,7 +30,13 @@ html {
   -webkit-font-smoothing: antialiased;
   font-smoothing: antialised;
   text-rendering: optimizeLegibility;
-  @apply bg-red-900;
+  @apply bg-black;
+}
+.blur {
+  filter: blur(8px);
+}
+img {
+  transition: .3s filter;
 }
 body {
   width: 100%;
@@ -80,4 +86,19 @@ body {
 }
 .textInput:focus+.empty, .empty:focus, .empty:focus-within {
   bottom: 0;
+}
+.trailer {
+  --width: 100%;
+}
+.video-container {
+  width: var(--width);
+  padding-bottom: calc(0.5625 * var(--width));
+}
+@media (min-width: 768px) {
+  .trailer {
+    --width: 90%;
+  }
+}
+.trailer video {
+  width: var(--width);
 }
