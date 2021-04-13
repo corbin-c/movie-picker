@@ -9,6 +9,7 @@ import EnrichedLinks from "../components/item-view/enriched-links.js";
 import CommercialLinks from "../components/item-view/commercial-links.js";
 import BackButton from "../components/item-view/back-button.js";
 import MovieDetails from "../components/item-view/movie-details/movie-details.js";
+import IncompletePersons from "../components/item-view/movie-details/incomplete-persons.js";
 
 import "./item-view.css";
 
@@ -85,8 +86,12 @@ function MovieView() {
     if (e) {
       e.preventDefault();
     }
+    let target = moviesArray[movieIndex-1];
+    if (typeof target === "undefined") {
+      target = moviesArray[moviesArray.length-1];
+    }
     history.replace("/");
-    history.push("/movie/"+moviesArray[movieIndex-1].id);
+    history.push("/movie/"+target.id);
   }
   
   const nextMovie = async (e) => {
@@ -229,7 +234,7 @@ function MovieView() {
                 genres={ movie.genres }
                 persons={ movie.roles }
               />
-            : <ul></ul>
+            : <IncompletePersons persons={ movie.roles } />
           }
           <section className="links">
             { (movie.trailer) && 
