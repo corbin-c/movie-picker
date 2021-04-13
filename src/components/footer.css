@@ -1,0 +1,72 @@
+footer {
+  @apply bg-red-900 text-yellow-50 w-screen p-5;
+}
+footer p {
+  @apply w-full text-lg text-center;
+}
+footer ul {
+  @apply mt-3 flex flex-row w-full justify-center;
+}
+footer li {
+  @apply px-3;
+}
+footer li a {
+  background-repeat: no-repeat;
+  background-size: 1.2rem 1.2rem;
+  background-position: 0 .2rem;
+  padding-left: 1.5rem;
+  @apply relative inline-block overflow-hidden hover:text-yellow-400;
+}
+footer li:nth-child(1) a {
+  background-image: url("./footer.svg#tw");
+}
+footer li:nth-child(2) a {
+  background-image: url("./footer.svg#linkedin");
+}
+footer li:nth-child(3) a {
+  background-image: url("./footer.svg#github");
+}
+footer li:nth-child(1) a:hover {
+  background-image: url("./footer.svg#tw-hover");
+}
+footer li:nth-child(2) a:hover {
+  background-image: url("./footer.svg#linkedin-hover");
+}
+footer li:nth-child(3) a:hover {
+  background-image: url("./footer.svg#github-hover");
+}
+footer li a::before, li a::after {
+  content: "";
+  position: absolute;
+  height: 1px;
+  width: calc(100% - 1.2rem);
+  bottom: 0;
+  left: 1.2rem;
+  right: 0;
+  background: #FBBF24;
+}
+footer li a::after {
+  opacity: 1;
+  transition: transform .8s cubic-bezier(.23,1,.32,1);
+  transform: translateX(102%);
+}
+footer li a::before {
+  transform: translateX(-102%);
+  opacity: 0;
+}
+footer li a:hover::before {
+  transition: transform .8s cubic-bezier(.23,1,.32,1);
+  transform: translateX(0);
+  opacity: 1;
+}
+li a:hover::after {
+  transition: none;
+  transform: translateX(0);
+  opacity: 0;
+}
+footer h3 {
+  @apply w-full text-center underline mt-3 text-sm;
+}
+footer .disclaimer {
+  @apply text-xs;
+}
