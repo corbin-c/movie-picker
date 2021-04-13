@@ -1,8 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useParams, useHistory, Link } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 
-import DispatchLink from "../components/dispatch-link.js";
 import MoviePoster from "../components/movie-poster.js";
 import TrailerOverlay from "../components/item-view/trailer.js";
 import EnrichedLinks from "../components/item-view/enriched-links.js";
