@@ -12,7 +12,7 @@ function GenresLinks(props) {
       </svg>
       <ul>
         { genres.map(e => (
-          <li>
+          <li key={ e }>
             <DispatchLink
               href="/"
               title={ "Browse movies with the genre "+e }

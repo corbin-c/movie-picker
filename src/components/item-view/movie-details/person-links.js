@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 
 function PersonLinks(props) {
   const { persons, type } = props;
+  const filter = (type === "director") ? type : "star";
   return (
     <li className="col-span-2">
       { (type === "director")
@@ -15,8 +16,8 @@ function PersonLinks(props) {
           <path d="M17.29 8c-.148 0-.292.01-.434.03a.75.75 0 11-.212-1.484 4.53 4.53 0 013.38 8.097 6.69 6.69 0 013.956 6.107.75.75 0 01-1.5 0 5.193 5.193 0 00-3.696-4.972l-.534-.16v-1.676l.41-.209A3.03 3.03 0 0017.29 8z"></path>
         </svg> }
       <ul>
-        { persons.filter(e => e.role === type).map(e => (
-          <li>
+        { persons.filter(e => e.role === filter).map(e => (
+          <li key={ e.id }>
             <Link
               to={ "/person/"+e.id }
               title={ "View more about this "+ type +": "+e.name }>
