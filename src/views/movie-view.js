@@ -2,11 +2,11 @@ import React, { useEffect, useState, useRef } from "react";
 import { useParams, useHistory, Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 
-import TrailerOverlay from "../components/trailer.js";
-import EnrichedLinks from "../components/enriched-links.js";
 import DispatchLink from "../components/dispatch-link.js";
 import MoviePoster from "../components/movie-poster.js";
-import BackButton from "../components/back-button.js";
+import TrailerOverlay from "../components/item-view/trailer.js";
+import EnrichedLinks from "../components/item-view/enriched-links.js";
+import BackButton from "../components/item-view/back-button.js";
 
 import "./item-view.css";
 
@@ -291,7 +291,7 @@ function MovieView() {
             { (movie.trailer) && 
               <div className="w-full flex-grow flex justify-around mb-1">
                 <button title="Play trailer" onClick={ () => setTrailer(state => true) } className="w-2/3 inline-flex justify-center">
-                  <svg className="fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fillRule="evenodd" d="M1.75 4.5a.25.25 0 00-.25.25v14.5c0 .138.112.25.25.25h20.5a.25.25 0 00.25-.25V4.75a.25.25 0 00-.25-.25H1.75zM0 4.75C0 3.784.784 3 1.75 3h20.5c.966 0 1.75.784 1.75 1.75v14.5A1.75 1.75 0 0122.25 21H1.75A1.75 1.75 0 010 19.25V4.75z"></path><path d="M9 15.584V8.416a.5.5 0 01.77-.42l5.576 3.583a.5.5 0 010 .842L9.77 16.005a.5.5 0 01-.77-.42z"></path></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fillRule="evenodd" d="M1.75 4.5a.25.25 0 00-.25.25v14.5c0 .138.112.25.25.25h20.5a.25.25 0 00.25-.25V4.75a.25.25 0 00-.25-.25H1.75zM0 4.75C0 3.784.784 3 1.75 3h20.5c.966 0 1.75.784 1.75 1.75v14.5A1.75 1.75 0 0122.25 21H1.75A1.75 1.75 0 010 19.25V4.75z"></path><path d="M9 15.584V8.416a.5.5 0 01.77-.42l5.576 3.583a.5.5 0 010 .842L9.77 16.005a.5.5 0 01-.77-.42z"></path></svg>
                   Play trailer
                 </button>
               </div>
@@ -342,11 +342,11 @@ function MovieView() {
         </article>
         {(!movie.incomplete && context) &&
         <a title="View previous movie" onClick={ previousMovie } className="btn-icon fixed bottom-2 right-15" href={ "/movie/"+movieIndex }>
-          <svg className="fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fillRule="evenodd" d="M10.78 19.03a.75.75 0 01-1.06 0l-6.25-6.25a.75.75 0 010-1.06l6.25-6.25a.75.75 0 111.06 1.06L5.81 11.5h14.44a.75.75 0 010 1.5H5.81l4.97 4.97a.75.75 0 010 1.06z"></path></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fillRule="evenodd" d="M10.78 19.03a.75.75 0 01-1.06 0l-6.25-6.25a.75.75 0 010-1.06l6.25-6.25a.75.75 0 111.06 1.06L5.81 11.5h14.44a.75.75 0 010 1.5H5.81l4.97 4.97a.75.75 0 010 1.06z"></path></svg>
         </a>}
         {(!movie.incomplete && context) &&
         <a title="View next movie" onClick={ nextMovie } className="btn-icon fixed bottom-2 right-2" href={ "/movie/"+movieIndex }>
-          <svg className="fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fillRule="evenodd" d="M13.22 19.03a.75.75 0 001.06 0l6.25-6.25a.75.75 0 000-1.06l-6.25-6.25a.75.75 0 10-1.06 1.06l4.97 4.97H3.75a.75.75 0 000 1.5h14.44l-4.97 4.97a.75.75 0 000 1.06z"></path></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fillRule="evenodd" d="M13.22 19.03a.75.75 0 001.06 0l6.25-6.25a.75.75 0 000-1.06l-6.25-6.25a.75.75 0 10-1.06 1.06l4.97 4.97H3.75a.75.75 0 000 1.5h14.44l-4.97 4.97a.75.75 0 000 1.06z"></path></svg>
         </a>}
         <TrailerOverlay classes={ (trailer) ? "":"hidden " } trailer={ movie.trailer } title={ movie.title } handleChange={ () => setTrailer(state => false) } />
       </section>

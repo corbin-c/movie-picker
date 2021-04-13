@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import MoviePoster from "./movie-poster.js";
+import MoviePoster from "../movie-poster.js";
 
 /* this component displays a clickable movie poster */
 
