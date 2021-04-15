@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 
 import PosterItem from "./poster-grid-item.js";
@@ -34,6 +35,11 @@ function MovieGrid(props) {
   const WAIT_INTERVAL = 1500;
   const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
 
+  const reset = (e) => {
+    e.preventDefault();
+    dispatch({type:"", reset: true});
+  }
+
   const handleObserver = (event) => {
     if (event[0].isIntersecting) {
       setNextPageNeeded(true);
@@ -41,6 +47,7 @@ function MovieGrid(props) {
   }
   
   const nextPage = async () => {
+    
     if (movies.length === 0 || loading) {
       return;
     }
@@ -78,7 +85,7 @@ function MovieGrid(props) {
   }
 
   const cleverJoin = (...values) => {
-    return [...new Set([...values])].join(",");
+    return [...new Set([...values.filter(e => e)])].join(",");
   }
 
   const fetchMovies = async (body) => {
@@ -133,6 +140,11 @@ function MovieGrid(props) {
     if ((Object.keys(queryBody).length > 1)
     && (movies.length === 0)
     && (!loading)) {
+      return (<div className="no-results p-5 text-yellow-50 text-3xl col-span-full row-span-full flex justify-around content-center items-center">
+        <p>
+          Sorry, no results were found. You can <a onClick={ reset } title="reset all the filters" href="/grid/">reset the filters</a> or <Link to="/movie/random/" title="random movie">get a random movie!</Link>
+        </p>
+      </div>)
       //no results
     } else if ((Object.keys(queryBody).length <= 1)
     || ((movies.length !== 0)
@@ -177,12 +189,15 @@ function MovieGrid(props) {
   }
 
   useEffect(() => {
-    tryToLoad();
     if (nextPageNeeded) {
       nextPage();
       setNextPageNeeded(state => false);
     }
   });
+  
+  useEffect(() => {
+    tryToLoad();
+  },[filters]);
 
   useEffect(() => {
     if (filtersView) {
