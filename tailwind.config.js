@@ -16,10 +16,6 @@ module.exports = {
       minWidth: {
         "16": "16.67%",
       },
-      zIndex: {
-        "50": 50,
-        "100": 100
-      }
     },
   },
   variants: {
