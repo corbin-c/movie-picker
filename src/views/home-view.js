@@ -8,11 +8,12 @@ function HomeView() {
   const history = useHistory();
   const [homeView,setHomeView] = useState(true);
   const handleChanges = (e) => {
-    const page = (e.id.slice(0,2) === "tt") ? "/movie/":"/person/";
-    history.push(page+e.id, { from: "/" });
+    if (e.id !== "") {
+      const page = (e.id.slice(0,2) === "tt") ? "/movie/":"/person/";
+      history.push(page+e.id, { from: "/" });
+    }
   }
   const toGrid = (e) => {
-    console.log("togrid");
     e.preventDefault();
     setHomeView(state => false);
     setTimeout(() => {
@@ -34,7 +35,7 @@ function HomeView() {
           formId=""
           placeHolder="Citizen Kane, Orson Welles…"
           handleChanges={ handleChanges }
-          path={{root: "http://localhost:8080/imdb/search/", type: "" }} />
+          path={{root: "/imdb/search/", type: "" }} />
         <p><a onClick={ toGrid } title="explore movies by browsing a grid view" href="/grid/">…or just explore the grid</a></p>
       </div>
       <footer>
