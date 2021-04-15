@@ -24,6 +24,7 @@ function MovieSorter(props) {
         <option value="num_votes">number of votes</option>
         <option value="boxoffice_gross_us">US gross box-office</option>
         <option value="runtime">runtime</option>
+        <option value="user_rating">user rating</option>
         <option value="year">release year</option>
       </select>
       <select value={ direction } name="direction" onChange={ changeDirection }>
