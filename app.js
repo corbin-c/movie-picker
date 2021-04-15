@@ -95,9 +95,6 @@ app.post("/imdb/movies/", async (req, res, next) => {
   }
 });
 
-app.get('*', (req,res) =>{
-});
-
 app.get("*", function (req, res, next) {
   res.sendFile(path.join(dist, "index.html"));
 });
