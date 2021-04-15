@@ -3,11 +3,14 @@ import { useSelector } from "react-redux";
 
 function SearchForm(props) {
   const { path, placeHolder, handleChanges, z, formId } = props;
-  const resultState = useSelector(state => state
-    .filters
-    [formId.split("/")[0]]
-    [formId.split("/")[1]]) 
-    || { name: "", id: "" };
+  const resultState = useSelector(state => {
+      try {
+        state = state.filters[formId.split("/")[0]][formId.split("/")[1]];
+        return state;
+      } catch {
+        return { name: "", id: "" }
+      }
+    }) || { name: "", id: "" };
   const [searchString,setSearchString] = useState("");
   const [resultsList,setResults] = useState([]);
   const timer = useRef(null);
@@ -20,7 +23,7 @@ function SearchForm(props) {
         onClick={ () => selectResult(item.l, item.id) }
         key={ item.id }>
           { item.l }
-          <span className="text-xs pr-3 text-red-700 group-hover:text-red-50"> { item.s } </span>
+          <span className="hidden md:inline text-xs pr-3 text-red-700 group-hover:text-red-50"> { item.s } </span>
         </li>
     });
   }
@@ -58,6 +61,13 @@ function SearchForm(props) {
       e.preventDefault();
       clearTimeout(timer.current);
       triggerChange(e.target.value);
+      if (resultsList.length > 0) {
+        handleChanges({
+          name:resultsList[0].l,
+          id:resultsList[0].id ,
+          source: formId
+        });
+      }
     }
   }
   const triggerChange = (value) => {
@@ -65,9 +75,7 @@ function SearchForm(props) {
   }
 
   useEffect(() => {
-    if (resultState.name !== "") {
-      setSearchString(resultState.name);
-    }
+    setSearchString(resultState.name);
   }, [setSearchString,resultState.name]);
 
   return (
