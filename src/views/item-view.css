@@ -26,7 +26,7 @@
   @apply md:row-span-2;
 }
 .item-view img {
-  @apply h-full object-contain border-0;
+  @apply h-full w-full object-contain border-0;
 }
 .item-view p {
   @apply col-start-1 row-start-2 md:col-start-2 md:row-start-1 text-lg;
