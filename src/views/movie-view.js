@@ -21,24 +21,25 @@ function MovieView() {
   const queryBody = useSelector(state => state.movies.body);
   const [context, setContext] = useState(true);
   const [trailer, setTrailer] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [trailerError, setTrailerError] = useState(false);
-  const [enrichedError, setEnrichedError] = useState(false);
+  const [trailerState, setTrailerState] = useState("unset");
+  const [enrichedState, setEnrichedState] = useState("unset");
   const [nextPageLoading, setnextPageLoading] = useState(false);
   const [movie, setMovie] = useState({});
   const [movieIndex, setMovieIndex] = useState(0);
   const section = useRef(null);
 
   const handleKeys = (e) => {
-    e.preventDefault();
     switch (e.key) {
       case "ArrowLeft":
+        e.preventDefault();
         previousMovie();
         break;
       case "ArrowRight":
+        e.preventDefault();
         nextMovie();
         break;
       case " ":
+        e.preventDefault();
         setTrailer(state => true);
         break;
       default:
@@ -89,7 +90,7 @@ function MovieView() {
     if (typeof target === "undefined") {
       target = moviesArray[moviesArray.length-1];
     }
-    history.replace("/");
+    history.replace("/grid/");
     history.push("/movie/"+target.id);
   }
   
@@ -108,7 +109,7 @@ function MovieView() {
     } else {
       targetId = targetId.id;
     }
-    history.replace("/");
+    history.replace("/grid/");
     history.push("/movie/"+targetId);
   }
 
@@ -118,61 +119,67 @@ function MovieView() {
     }
   });
 
-  useEffect(() => { //fetches enriched data from wikidata & trailer
+  useEffect(() => {
+    if (movie.enriched || enrichedState !== "unset" || typeof movie.title === "undefined") {
+      return null;
+    }
+    (async () => {
+      setEnrichedState(state => "loading");
+      let enrichedData = await fetch("/imdb/enrich/"+movie.id);
+      enrichedData = await enrichedData.json();
+      if (!enrichedData.error) {
+        movie.enriched = enrichedData;
+        if (!movie.incomplete) {
+          dispatch( {
+            type: "movies/update",
+            payload: { 
+              id: movie.id,
+              property: "enriched",
+              value: enrichedData
+            }
+          });
+        }
+        setEnrichedState(state => "ready");
+        setMovie(state => ({...movie}));
+      } else {
+        setEnrichedState(state => "error");
+      }
+    })();
+  },[movie,dispatch,enrichedState]);
+
+  useEffect(() => {
+    if (movie.trailer || trailerState !== "unset" || typeof movie.title === "undefined") {
+      return null;
+    }
+    (async () => {
+      setTrailerState(state => "loading");
+      let trailer = await fetch("/imdb/trailer/"+movie.title+"/"+movie.year+"/"+movie.id);
+      trailer = await trailer.json();
+      if (!trailer.error) {
+        movie.trailer = trailer;
+        if (!movie.incomplete) {
+          dispatch( {
+            type: "movies/update",
+            payload: { 
+              id: movie.id,
+              property: "trailer",
+              value: trailer
+            }
+          });
+        }
+        setTrailerState(state => "ready");
+        setMovie(state => ({...movie}));
+      } else {
+        setTrailerState(state => "error");
+      }
+    })();
+  },[movie,dispatch,trailerState]);
+
+  useEffect(() => { //updates doc title
     if ((document.title !== "Movie Picker | "+movie.title) && (typeof movie.title !== "undefined")) {
       document.title = "Movie Picker | "+movie.title;
     }
-    if (!loading) {
-      if ((!movie.enriched) && (!enrichedError) && (movie.id)) {
-        (async () => {
-          setLoading(state => true);
-          let enrichedData = await fetch("/imdb/enrich/"+movie.id);
-          enrichedData = await enrichedData.json();
-          if (!enrichedData.error) {
-            movie.enriched = enrichedData;
-            if (!movie.incomplete) {
-              dispatch( {
-                type: "movies/update",
-                payload: { 
-                  id: movie.id,
-                  property: "enriched",
-                  value: enrichedData
-                }
-              });
-            }
-            setMovie(state => ({...movie}));
-          } else {
-            setEnrichedError(state => true);
-          }
-          setLoading(state => false);
-        })();
-      }
-      if ((!movie.trailer) && (!trailerError) && (movie.title)) {
-        (async () => {
-          setLoading(state => true);
-          let trailer = await fetch("/imdb/trailer/"+movie.title+"/"+movie.year+"/"+movie.id);
-          trailer = await trailer.json();
-          if (!trailer.error) {
-            movie.trailer = trailer;
-            if (!movie.incomplete) {
-              dispatch( {
-                type: "movies/update",
-                payload: { 
-                  id: movie.id,
-                  property: "trailer",
-                  value: trailer
-                }
-              });
-            }
-            setMovie(state => ({...movie}));
-          } else {
-            setTrailerError(state => true);
-          }
-          setLoading(state => false);
-        })();
-      }
-    }
-  },[movie,dispatch,enrichedError,trailerError,loading]);
+  },[movie]);
 
   useEffect(() => { //initializes component with movie data
     if (id === "random") {
@@ -189,6 +196,7 @@ function MovieView() {
           fetchedMovie = await fetchedMovie.json();
           if (fetchedMovie.error) {
             //REDIRECT TO 404
+            history.push("/404");
           }
           fetchedMovie.incomplete = true;
           setMovie(state => fetchedMovie);
@@ -201,17 +209,18 @@ function MovieView() {
   },[id,movieSelector,moviesArray]);
 
   useEffect(() => { //restore error status when id changes
-    setEnrichedError(state => false);
-    setTrailerError(state => false);
+    setEnrichedState(state => "unset");
+    setTrailerState(state => "unset");
+    window.scrollTo(0, 0);
   },[id]);
 
   return (
     (Object.keys(movie).length === 0)
       ? <section ref={ section } >
-          <BackButton title="Go back to grid view" href={ true } />
+          <BackButton title="Go back to grid view" />
         </section>
       : <section onKeyDown={ handleKeys } ref={ section } tabIndex="1" className="item-view">
-        <BackButton title="Go back to grid view" />
+        <BackButton title="Go back to grid view" href={ movie.incomplete } />
         <header>
           <h1>{ movie.title }</h1>
           <h2>{ movie.year }</h2>
@@ -239,7 +248,7 @@ function MovieView() {
             { (movie.trailer) && 
               <div className="w-full flex-grow flex justify-around mb-1">
                 <button title="Play trailer" onClick={ () => setTrailer(state => true) } className="w-2/3 inline-flex justify-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fillRule="evenodd" d="M1.75 4.5a.25.25 0 00-.25.25v14.5c0 .138.112.25.25.25h20.5a.25.25 0 00.25-.25V4.75a.25.25 0 00-.25-.25H1.75zM0 4.75C0 3.784.784 3 1.75 3h20.5c.966 0 1.75.784 1.75 1.75v14.5A1.75 1.75 0 0122.25 21H1.75A1.75 1.75 0 010 19.25V4.75z"></path><path d="M9 15.584V8.416a.5.5 0 01.77-.42l5.576 3.583a.5.5 0 010 .842L9.77 16.005a.5.5 0 01-.77-.42z"></path></svg>
+                  <svg className="fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fillRule="evenodd" d="M1.75 4.5a.25.25 0 00-.25.25v14.5c0 .138.112.25.25.25h20.5a.25.25 0 00.25-.25V4.75a.25.25 0 00-.25-.25H1.75zM0 4.75C0 3.784.784 3 1.75 3h20.5c.966 0 1.75.784 1.75 1.75v14.5A1.75 1.75 0 0122.25 21H1.75A1.75 1.75 0 010 19.25V4.75z"></path><path d="M9 15.584V8.416a.5.5 0 01.77-.42l5.576 3.583a.5.5 0 010 .842L9.77 16.005a.5.5 0 01-.77-.42z"></path></svg>
                   Play trailer
                 </button>
               </div>
