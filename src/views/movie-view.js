@@ -183,12 +183,14 @@ function MovieView() {
 
   useEffect(() => { //initializes component with movie data
     if (id === "random") {
-      (async () => {
-        let movie = await fetch("/imdb/randomMovie");
-        movie = await movie.json();
-        setMovie(state => movie[0]);
-        setContext(state => false);
-      })();
+      if (typeof movie.id === "undefined") {
+        (async () => {
+          let movie = await fetch("/imdb/randomMovie");
+          movie = await movie.json();
+          setMovie(state => movie[0]);
+          setContext(state => false);
+        })();
+      }
     } else {
       if (typeof movieSelector === "undefined") {
         (async () => {
