@@ -206,7 +206,7 @@ function MovieView() {
         setMovieIndex(state => (moviesArray.findIndex(e => e.id === id)));
       }
     }
-  },[id,movieSelector,moviesArray]);
+  },[id,movieSelector,moviesArray,history]);
 
   useEffect(() => { //restore error status when id changes
     setEnrichedState(state => "unset");

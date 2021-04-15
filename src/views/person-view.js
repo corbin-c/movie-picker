@@ -53,7 +53,7 @@ function PersonView() {
       setPerson(state => ({...person}));
     })();
     window.scrollTo(0, 0);
-  },[id]);
+  },[id,history]);
 
   return (
     (Object.keys(person).length === 0)
