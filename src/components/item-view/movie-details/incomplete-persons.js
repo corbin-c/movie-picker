@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 function IncompletePersons(props) {
   const { persons } = props;
   return (
-    <ul>
+    <ul className="details-list">
       <li className="col-span-2">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
           <path fillRule="evenodd" d="M3.5 8a5.5 5.5 0 118.596 4.547 9.005 9.005 0 015.9 8.18.75.75 0 01-1.5.045 7.5 7.5 0 00-14.993 0 .75.75 0 01-1.499-.044 9.005 9.005 0 015.9-8.181A5.494 5.494 0 013.5 8zM9 4a4 4 0 100 8 4 4 0 000-8z"></path>
@@ -15,7 +15,7 @@ function IncompletePersons(props) {
           { persons.map(e => (
             <li key={ e.name } >
               <Link
-                to={ "/person/"+e.name }
+                to={ {pathname: "/person/"+e.name, state: {from: "person-links" } } }
                 title={ "View more about "+e.name }>
                 {e.name}
               </Link>
