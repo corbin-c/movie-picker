@@ -15,7 +15,7 @@ function Footer(props) {
       <p className="disclaimer">This website exposes data from <a target="_blank" rel="noopener noreferrer" href="https://www.imdb.com/" title="IMDB website">the Internet Movie DataBase (IMDB)</a>. All our bases are belong to them.</p>
       <p className="disclaimer">It does not intent to become a competitor of IMDB nor has commercial purpose: It only has experimental
       and learning purpose.</p>
-      <p className="disclaimer">This website basically acts like a proxy to provide a better browsing & film discovery experience and does not store IMDB
+      <p className="disclaimer">This website basically acts like a proxy to provide a better browsing & movie discovery experience and does not store IMDB
       or user data in any way.</p>
       <p className="disclaimer">All displayed information remains the intellectual property of IMDB or their legal owner.</p>
     </footer>
