@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Link, useHistory } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 
 function Error404() {
   const dispatch = useDispatch();
-  const history = useHistory();
   const section = useRef(null);
   const [covers, setCovers] = useState([]);
   const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
@@ -62,13 +61,7 @@ function Error404() {
       dispatch({ type: "movies/nextPage", payload: results });
       setCovers(state => results);
     })();
-  },[]);
-  
-  const reset = (e) => {
-    e.preventDefault();
-    dispatch({type:"", reset: true});
-    history.push("/grid/");
-  }
+  },[dispatch]);
   
   return (<section ref={ section } className="err-404">
   <h1>404</h1>
