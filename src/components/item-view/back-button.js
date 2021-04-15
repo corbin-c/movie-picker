@@ -1,16 +1,21 @@
 import React from "react";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 
 function BackButton(props) {
   const { icon, title, href } = props;
   const history = useHistory();
+  const location = useLocation();
   const handleClick = (e) => {
-    if (!href) {
-      e.preventDefault();
+    e.preventDefault();
+    if ((href === true)
+    || ((location.pathname.slice(0,8) === "/person/") && (typeof location.state === "undefined"))
+    || (location.state?.from === "/")) {
+      history.push("/grid/");
+    } else {
       history.goBack();
     }
   };
-  return (<a onClick={ handleClick } title={ title } className="btn-icon fixed top-2 left-2" href="/">
+  return (<a onClick={ handleClick } title={ title } className="btn-icon fixed top-2 left-2" href="/grid/">
       { (icon === "arrow")
         ? <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fillRule="evenodd" d="M10.78 19.03a.75.75 0 01-1.06 0l-6.25-6.25a.75.75 0 010-1.06l6.25-6.25a.75.75 0 111.06 1.06L5.81 11.5h14.44a.75.75 0 010 1.5H5.81l4.97 4.97a.75.75 0 010 1.06z"></path></svg>
         : <svg width="24px" height="24px" xmlns="http://www.w3.org/2000/svg">

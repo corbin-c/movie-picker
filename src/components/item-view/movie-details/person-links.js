@@ -19,7 +19,7 @@ function PersonLinks(props) {
         { persons.filter(e => e.role === filter).map(e => (
           <li key={ e.id }>
             <Link
-              to={ "/person/"+e.id }
+              to={ {pathname: "/person/"+e.id, state: {from: "person-links" } } }
               title={ "View more about this "+ type +": "+e.name }>
               {e.name}
             </Link>

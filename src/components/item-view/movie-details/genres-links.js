@@ -14,7 +14,7 @@ function GenresLinks(props) {
         { genres.map(e => (
           <li key={ e }>
             <DispatchLink
-              href="/"
+              href="/grid/"
               title={ "Browse movies with the genre "+e }
               action={ { type: "filters/genres/add", payload: e.toLowerCase(), reset: true } }>
               {e}
