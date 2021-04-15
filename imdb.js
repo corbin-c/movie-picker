@@ -28,7 +28,7 @@ class IMDB {
     };
     this.SUGGESTIONS_TYPES = ["names","titles"];
     this.SORT_KEYS = [
-      "alpha","num_votes","boxoffice_gross_us","moviemeter","runtime","year"
+      "alpha","num_votes","boxoffice_gross_us","moviemeter","runtime","year","user_rating"
     ];
     this.GENRES = ["action","adventure","animation","biography","comedy",
       "crime","documentary","drama","family","fantasy","film-noir",
@@ -70,14 +70,16 @@ class IMDB {
   }
   async suggestions(query,type) {
     if (this.SUGGESTIONS_TYPES.includes(type)) {
-      type = type+"/" 
+      type = type+"/";
+      let url = "https://v2.sg.media-imdb.com/suggestion/"+type+query[0].toLowerCase()+"/"+query+".json"
+      url = await fetch(url);
+      url = await url.json();
+      return url.d;
     } else {
-      type = "";
+      let names = await this.suggestions(query,"names");
+      let titles = await this.suggestions(query,"titles");
+      return [...names, ...titles].sort((a,b) => a.rank - b.rank).slice(0,8);
     }
-    let url = "https://v2.sg.media-imdb.com/suggestion/"+type+query[0].toLowerCase()+"/"+query+".json"
-    url = await fetch(url);
-    url = await url.json();
-    return url.d;
   }
   async getMovieById(id) {
     let suggestion = await this.suggestions(id,"titles");
@@ -89,7 +91,7 @@ class IMDB {
     movie.year = suggestion.y;
     movie.rating = "";
     movie.abstract = "";
-    movie.roles = suggestion.s.split(",").map(e => ({ name: e }));
+    movie.roles = suggestion.s.split(",").map(e => ({ name: utils.trimSpaces(e) }));
     return movie;
   }
   async fetchMovie(url) {
@@ -186,10 +188,14 @@ class IMDB {
       utils.render(
         utils.querySelector(".subpage_title_block .parent h3 a","",root)
     ));
-    person.bio = utils.trimSpaces(
-      utils.render(
-        utils.querySelector("#bio_content .soda p","",root)
-    ));
+    try {
+      person.bio = utils.trimSpaces(
+        utils.render(
+          utils.querySelector("#bio_content .soda p","",root)
+      ));
+    } catch {
+      person.bio = "";
+    }
     return person;
   }
   async getMovies(parameters) {
