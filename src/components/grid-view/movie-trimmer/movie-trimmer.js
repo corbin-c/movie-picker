@@ -40,11 +40,11 @@ function MovieTrimmer(props) {
           <summary>Awards</summary>
           <ListPicker source="awards" />
         </details>
-        <details>
+        <details className="range">
           <summary>User rating</summary>
           <DoubleRange use="rating" start={0} end={10} />
         </details>
-        <details>
+        <details className="range">
           <summary>Runtime</summary>
           <DoubleRange use="runtime" start={5} end={240} />
         </details>

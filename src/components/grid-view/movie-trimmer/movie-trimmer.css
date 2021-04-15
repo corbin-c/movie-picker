@@ -52,6 +52,9 @@ summary:before {
   transition: .6s all;
   @apply inline-block pr-2;
 }
+.range[open] {
+  @apply pb-4 md:pb-0;
+}
 details[open] summary:before {
   transform: translateY(.3rem) rotate(90deg);
 }
