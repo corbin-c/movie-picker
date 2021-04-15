@@ -33,9 +33,7 @@ function TextInput(props) {
   }
   
   useEffect(() => {
-    if (selector !== "") {
-      setSearchString(selector);
-    }
+    setSearchString(selector);
   }, [setSearchString,selector]);
   
   return (
