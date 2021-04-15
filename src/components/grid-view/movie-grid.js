@@ -47,7 +47,6 @@ function MovieGrid(props) {
   }
   
   const nextPage = async () => {
-    
     if (movies.length === 0 || loading) {
       return;
     }
@@ -237,7 +236,7 @@ function MovieGrid(props) {
       <div className="min-h-screen movie-grid">
         { makeGrid() }
       </div>
-      <div className={ ((movies.length < count) ? "hidden":"") + " h-1 mt-1"} ref={ lastMovie }></div>
+      <div className={ ((movies.length < count) ? "hidden":"") + " h-1 mt-1 mb-16 md:mb-0"} ref={ lastMovie }></div>
     </section>
   )
 }
