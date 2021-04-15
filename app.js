@@ -33,9 +33,10 @@ app.get("/imdb/search/:queryString/:type?", async (req, res, next) => {
 });
 
 app.get("/imdb/randomMovie", async (req, res, next) => {
+  let sort = IMDB.SORT_KEYS[Math.floor(Math.random()*IMDB.SORT_KEYS.length)];
   try {
     res.json(await IMDB.getMovies({
-      sort: "user_rating,desc",
+      sort: sort+",desc",
       count: 1,
       start: Math.floor(Math.random()*10000)
     }));
