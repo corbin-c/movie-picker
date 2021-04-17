@@ -14,6 +14,7 @@ function PersonView() {
   const history = useHistory();
   const [person, setPerson] = useState({});
   const [readMore, setMore] = useState(false);
+  const [noReadMore, setNoReadMore] = useState(false);
 
   const handleReadMore = () => {
     setMore(state => !state);
@@ -21,6 +22,10 @@ function PersonView() {
   
   const getShortText = (text,limit) => {
     text = text.split(" ");
+    if (text.length < limit+1) {
+      setNoReadMore(e => true);
+      return text.join(" ");
+    }
     const dot = text.findIndex((e,i) => e.includes(".") && i >= limit);
     return text.slice(0,dot+1).join(" ");
   }
@@ -76,9 +81,11 @@ function PersonView() {
               title={ person.name } />
           </figure>
           <p>{ (readMore) ? person.bio : getShortText(person.bio,100) }
-          <button className="ml-auto rounded-lg border-2 border-solid bg-black m-2 block text-center border-yellow-50 hover:bg-yellow-50 hover:text-black active:bg-red-700 active:border-red-900 active:text-red-50 px-3 py-2" onClick= { handleReadMore }>
-            Read { (readMore) ? "less":"more" }
-          </button>
+          { (!noReadMore) &&
+            <button className="ml-auto rounded-lg border-2 border-solid bg-black m-2 block text-center border-yellow-50 hover:bg-yellow-50 hover:text-black active:bg-red-700 active:border-red-900 active:text-red-50 px-3 py-2" onClick= { handleReadMore }>
+              Read { (readMore) ? "less":"more" }
+            </button>
+          }
           </p>
           <section className="links">
             <div className="w-full flex-grow flex justify-around mb-1">
