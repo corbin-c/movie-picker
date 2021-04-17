@@ -202,8 +202,37 @@ class IMDB {
     let movieList = await this.fetchMovie(this.buildQuery(parameters));
     return movieList;
   }
-  async wikiDataSPARQL(imdb_id) {
-    let url = "https://query.wikidata.org/sparql?query=SELECT%20%3Fitem%20%3Frotten%20%3Fmeta%20%3Fwiki%20WHERE%20%7B%0A%20%20%3Fitem%20wdt%3AP345%20%22"+imdb_id+"%22.%0A%20%20%3Fitem%20wdt%3AP1258%20%3Frotten.%0A%20%20%3Fitem%20wdt%3AP1712%20%3Fmeta.%0A%20%20%3Farticle%20schema%3Aabout%20%3Fitem%3B%0A%20%20%20%20schema%3AinLanguage%20%3Flang%3B%0A%20%20%20%20schema%3Aname%20%3Fwiki%3B%0A%20%20%20%20schema%3AisPartOf%20_%3Ab7.%0A%20%20_%3Ab7%20wikibase%3AwikiGroup%20%22wikipedia%22.%0A%20%20FILTER(%3Flang%20IN(%22en%22))%0A%20%20FILTER(!(CONTAINS(%3Fwiki%2C%20%22%3A%22)))%0A%7D&format=json";
+  async wikiDataSPARQL(imdb_id, name, type) {
+    const item_definitions = {
+      person: `?item wdt:P31 wd:Q5.
+?item wdt:P106 ?occupations.
+?item rdfs:label "${name}"@en.`,
+      movie: `?item wdt:P31 wd:Q11424.
+?item rdfs:label "${name}"@en.`
+    }
+    const query = `select distinct ?item ?rotten ?meta ?wiki WHERE {
+  {
+    ${item_definitions[type]}
+  }
+  union {
+    ?item wdt:P345 "${imdb_id}".   
+  }
+  optional {
+    ?item wdt:P1258 ?rotten.
+  }
+  optional {
+    ?item wdt:P1712 ?meta.
+  }
+  ?article schema:about ?item;
+    schema:inLanguage ?lang;
+    schema:name ?wiki;
+    schema:isPartOf _:b7.
+  _:b7 wikibase:wikiGroup "wikipedia".
+  FILTER(?lang IN("en"))
+  FILTER(!(CONTAINS(?wiki, ":")))
+}
+`+((type === "person") ? "VALUES ?occupations  { wd:Q3282637 wd:Q2526255 wd:Q33999 }":"");
+    let url = "https://query.wikidata.org/sparql?query="+encodeURI(query)+"&format=json";
     url = await fetch(url);
     url = await url.json();
     url = url.results.bindings[0];

@@ -125,7 +125,7 @@ function MovieView() {
     }
     (async () => {
       setEnrichedState(state => "loading");
-      let enrichedData = await fetch("/imdb/enrich/"+movie.id);
+      let enrichedData = await fetch("/imdb/enrich/movie/"+movie.id+"/"+movie.title);
       enrichedData = await enrichedData.json();
       if (!enrichedData.error) {
         movie.enriched = enrichedData;

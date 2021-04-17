@@ -31,7 +31,7 @@ function PersonView() {
     }
     if ((!person.enriched) && (person.id)){
       (async () => {
-        let enrichedData = await fetch("/imdb/enrich/"+person.id);
+      let enrichedData = await fetch("/imdb/enrich/person/"+person.id+"/"+person.name);
         enrichedData = await enrichedData.json();
         if (!enrichedData.error) {
           person.enriched = enrichedData;

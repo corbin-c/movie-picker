@@ -53,9 +53,9 @@ app.get("/imdb/person/:queryString", async (req, res, next) => {
   }
 });
 
-app.get("/imdb/enrich/:id", async (req, res, next) => {
+app.get("/imdb/enrich/:type/:id/:name", async (req, res, next) => {
   try {
-    res.json(await IMDB.wikiDataSPARQL(req.params.id));
+    res.json(await IMDB.wikiDataSPARQL(req.params.id,req.params.name,req.params.type));
   } catch(e) {
     next(new Error(e));
   }
