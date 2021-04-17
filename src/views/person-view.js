@@ -82,9 +82,9 @@ function PersonView() {
           </figure>
           <p>{ (readMore) ? person.bio : getShortText(person.bio,100) }
           { (!noReadMore) &&
-            <button className="ml-auto rounded-lg border-2 border-solid bg-black m-2 block text-center border-yellow-50 hover:bg-yellow-50 hover:text-black active:bg-red-700 active:border-red-900 active:text-red-50 px-3 py-2" onClick= { handleReadMore }>
+            (<button className="ml-auto rounded-lg border-2 border-solid bg-black m-2 block text-center border-yellow-50 hover:bg-yellow-50 hover:text-black active:bg-red-700 active:border-red-900 active:text-red-50 px-3 py-2" onClick= { handleReadMore }>
               Read { (readMore) ? "less":"more" }
-            </button>
+            </button>)
           }
           </p>
           <section className="links">
