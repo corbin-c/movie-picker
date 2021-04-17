@@ -223,13 +223,15 @@ class IMDB {
   optional {
     ?item wdt:P1712 ?meta.
   }
-  ?article schema:about ?item;
-    schema:inLanguage ?lang;
-    schema:name ?wiki;
-    schema:isPartOf _:b7.
-  _:b7 wikibase:wikiGroup "wikipedia".
-  FILTER(?lang IN("en"))
-  FILTER(!(CONTAINS(?wiki, ":")))
+  optional {
+    ?article schema:about ?item;
+      schema:inLanguage ?lang;
+      schema:name ?wiki;
+      schema:isPartOf _:b7.
+    _:b7 wikibase:wikiGroup "wikipedia".
+    FILTER(?lang IN("en"))
+    FILTER(!(CONTAINS(?wiki, ":")))
+  }
 }
 `+((type === "person") ? "VALUES ?occupations  { wd:Q3282637 wd:Q2526255 wd:Q33999 }":"");
     let url = "https://query.wikidata.org/sparql?query="+encodeURI(query)+"&format=json";
